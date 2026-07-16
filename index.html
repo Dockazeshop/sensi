@@ -1,1 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>GERADOR DE LIKE · DOCKAZE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b0b0b;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      cursor: none;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    .cursor-glow {
+      width: 20px; height: 20px;
+      background: radial-gradient(circle, #ff003388, transparent 70%);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      transform: translate(-50%, -50%);
+      transition: width 0.15s, height 0.15s;
+    }
+    .cursor-glow.active { width: 50px; height: 50px; background: radial-gradient(circle, #ff444466, transparent 70%); }
+    #scroll-progress {
+      position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, #ff0033, #ff4400);
+      z-index: 9998; width: 0%; transition: width 0.1s;
+    }
+    #loader {
+      position: fixed; inset: 0; background: #0b0b0b; z-index: 10000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.6s;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .loader-ring {
+      width: 70px; height: 70px; border-radius: 50%; border: 6px solid transparent;
+      border-top: 6px solid #ff0033; border-right: 6px solid #ff4400;
+      animation: spin 1s linear infinite; box-shadow: 0 0 30px #ff003355;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .glass {
+      background: rgba(255,255,255,0.02); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,0,50,0.15); border-radius: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .neon-border { border: 1px solid #ff003366; box-shadow: 0 0 20px #ff003344, inset 0 0 20px #ff003311; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 1.2rem; }
+    .header-center { text-align: center; padding: 1.5rem 0 0.5rem; }
+    .neon-pulse {
+      font-size: 3.2rem; font-weight: 800; letter-spacing: 2px;
+      background: linear-gradient(135deg, #ff0033, #ff4400, #cc0033);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #ff003388, 0 0 60px #ff440044;
+      animation: pulseGlow 3s infinite alternate;
+    }
+    @keyframes pulseGlow { 0% { text-shadow: 0 0 20px #ff003366, 0 0 40px #ff440033; } 100% { text-shadow: 0 0 40px #ff0033cc, 0 0 80px #ff440066; } }
+    .card-sensi { max-width: 600px; margin: 0 auto 2rem; padding: 2rem 2rem 1.8rem; text-align: center; }
+    .card-sensi label { font-weight: 600; color: #ccc; display: block; margin-bottom: 0.5rem; }
+    .dpi-input {
+      width: 100%; padding: 0.9rem; border-radius: 60px; border: 1px solid #ff003355;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); color: #fff; font-size: 1.2rem;
+      text-align: center; outline: none; transition: 0.3s;
+    }
+    .dpi-input:focus { border-color: #ff4400; box-shadow: 0 0 30px #ff440044; }
+    .btn-primary {
+      margin-top: 1.5rem; padding: 0.9rem 2.8rem; border: none; border-radius: 60px;
+      background: linear-gradient(135deg, #ff0033, #cc0022); color: #fff; font-weight: 700; font-size: 1.2rem;
+      box-shadow: 0 0 30px #ff003366; transition: 0.3s; position: relative; overflow: hidden; cursor: none;
+    }
+    .btn-primary:hover { transform: scale(1.04); box-shadow: 0 0 50px #ff0033aa; }
+    .btn-primary .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); animation: rippleAnim 0.6s linear; }
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+    .btn-primary .shine {
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.08), transparent);
+      transform: rotate(25deg); animation: shineMove 4s infinite;
+    }
+    @keyframes shineMove { 0% { transform: translateX(-100%) rotate(25deg); } 100% { transform: translateX(100%) rotate(25deg); } }
+    .results-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;
+      margin: 1.8rem 0;
+    }
+    .res-item {
+      background: rgba(255,255,255,0.02); backdrop-filter: blur(6px); padding: 0.8rem 0.5rem;
+      border-radius: 20px; border: 1px solid #ff003344; text-align: center;
+      transition: 0.3s; box-shadow: 0 4px 20px #00000055;
+    }
+    .res-item:hover { transform: translateY(-4px); border-color: #ff4400; box-shadow: 0 0 30px #ff440033; }
+    .res-item .label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    .res-item .value { font-size: 2rem; font-weight: 700; color: #fff; text-shadow: 0 0 20px #ff003366; }
+    .copy-btn {
+      margin: 0.5rem 0 0; padding: 0.5rem 2rem; border: 1px solid #ff4400; border-radius: 40px;
+      background: transparent; color: #ff4400; font-weight: 600; transition: 0.3s; cursor: none;
+    }
+    .copy-btn:hover { background: #ff440022; box-shadow: 0 0 30px #ff440044; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 1rem; margin: 2rem 0;
+    }
+    .stat-card { padding: 1rem; text-align: center; border-radius: 24px; background: #ffffff08; backdrop-filter: blur(4px); border: 1px solid #ff003322; }
+    .stat-card .num { font-size: 2rem; font-weight: 700; color: #ff0033; }
+    .review-card { padding: 1.5rem; margin: 2rem 0; }
+    .review-form input, .review-form textarea, .review-form select {
+      width: 100%; margin: 0.3rem 0; padding: 0.7rem; border-radius: 20px;
+      border: 1px solid #ff003344; background: #1a1a1a; color: #fff;
+    }
+    .review-form input::placeholder, .review-form textarea::placeholder { color: #666; }
+    .review-form .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .review-form .row select { width: auto; flex: 1; }
+    .review-list { margin-top: 1.5rem; max-height: 400px; overflow-y: auto; }
+    .review-item {
+      background: #ffffff08; padding: 0.8rem; border-radius: 16px; margin-bottom: 0.7rem;
+      border-left: 3px solid #ff4400;
+    }
+    .review-item .stars { color: #ffd700; }
+    .review-item .date { font-size: 0.7rem; color: #888; }
+    .review-item .name { font-weight: 700; color: #fff; }
+    footer { margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid #ff003344; text-align: center; }
+    .dockaze {
+      font-weight: 800; font-size: 1.6rem;
+      background: linear-gradient(135deg, #ff0033, #ff4400, #cc0033);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #ff003388; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .verified-icon { color: #ff0033; font-size: 1.2rem; filter: drop-shadow(0 0 8px #ff0033); }
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #1a1a1a; backdrop-filter: blur(12px); padding: 0.8rem 2rem;
+      border-radius: 60px; border: 1px solid #ff0033; box-shadow: 0 0 40px #ff003344;
+      font-weight: 600; opacity: 0; transition: 0.4s; z-index: 999;
+    }
+    #toast.show { opacity: 1; bottom: 50px; }
+    @media (max-width: 640px) { .neon-pulse { font-size: 2.2rem; } .results-grid { grid-template-columns: repeat(2,1fr); } }
+    #tsparticles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0b0b0b; } ::-webkit-scrollbar-thumb { background: #ff0033; border-radius: 10px; }
+    .sensi-details { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; text-align: left; }
+    .sensi-details .detail-item { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #ffffff11; }
+    .sensi-details .detail-item .label { color: #aaa; }
+    .sensi-details .detail-item .value { color: #ff4400; font-weight: 600; }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #ff0033; animation: spin 0.8s linear infinite; margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <div id="loader"><div class="loader-ring"></div><p style="margin-top:1rem;color:#888;">Carregando...</p></div>
+  <div id="scroll-progress"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <div id="tsparticles"></div>
+  <div id="toast">✨ Sensibilidade copiada!</div>
 
+  <div class="container">
+    <div class="header-center" data-aos="fade-down">
+      <div class="neon-pulse">GERADOR DE LIKE</div>
+    </div>
+
+    <div class="card-sensi glass neon-border" data-aos="flip-up">
+      <label><i class="fas fa-mouse-pointer" style="color:#ff0033;"></i> Digite seu DPI</label>
+      <input type="number" id="dpiInput" class="dpi-input" placeholder="100 – 1000" min="100" max="1000" value="400">
+      <button class="btn-primary" id="generateBtn"><span class="shine"></span> GERAR SENSIBILIDADE</button>
+      <div id="resultsContainer" style="margin-top:1.5rem;"></div>
+      <button class="copy-btn" id="copySensiBtn" style="display:none;"><i class="fas fa-copy"></i> COPIAR SENSI</button>
+    </div>
+
+    <div class="stats-grid" data-aos="fade-up">
+      <div class="stat-card"><div class="num" id="totalGen">0</div><span>Gerações</span></div>
+      <div class="stat-card"><div class="num" id="totalReviews">0</div><span>Avaliações</span></div>
+      <div class="stat-card"><div class="num" id="avgRating">0.0</div><span>Média ★</span></div>
+      <div class="stat-card"><div class="num" id="onlineUsers">42</div><span>Online</span></div>
+    </div>
+
+    <div class="review-card glass" data-aos="fade-left">
+      <h3><i class="fas fa-star" style="color:#ffd700;"></i> Avaliações <span id="avgDisplay" style="font-size:0.9rem;color:#aaa;"></span></h3>
+      <div class="review-form">
+        <input type="text" id="reviewName" placeholder="Ex: Lucas">
+        <textarea id="reviewComment" placeholder="Digite seu comentário..."></textarea>
+        <div class="row">
+          <span>Nota: </span>
+          <select id="reviewStars">
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★</option>
+            <option value="3">★★★</option>
+            <option value="2">★★</option>
+            <option value="1">★</option>
+          </select>
+          <button class="btn-primary" id="submitReviewBtn" style="padding:0.5rem 1.5rem;font-size:0.9rem;">Enviar</button>
+        </div>
+      </div>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+
+    <footer>
+      <div style="height:2px;width:80%;margin:0 auto 1.5rem;background:linear-gradient(90deg,transparent,#ff0033,transparent);"></div>
+      <p>© 2026 Todos os direitos reservados.</p>
+      <div style="display:flex;justify-content:center;align-items:center;gap:0.5rem;margin-top:0.5rem;">
+        <span style="color:#aaa;">Desenvolvido por</span>
+        <span class="dockaze">DOCKAZE <i class="fas fa-check-circle verified-icon"></i></span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // ========== INICIALIZAÇÕES ==========
+    AOS.init({ duration: 800, once: false, mirror: true });
+
+    window.addEventListener('load', () => {
+      document.getElementById('loader').classList.add('hidden');
+    });
+
+    window.addEventListener('scroll', () => {
+      let scroll = document.documentElement.scrollTop || document.body.scrollTop;
+      let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      document.getElementById('scroll-progress').style.width = (scroll / height) * 100 + '%';
+    });
+
+    // Cursor personalizado
+    const cursor = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.addEventListener('mousedown', () => cursor.classList.add('active'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+
+    // Partículas
+    tsParticles.load('tsparticles', {
+      particles: {
+        number: { value: 60 },
+        color: { value: ['#ff0033', '#ff4400', '#cc0033'] },
+        opacity: { value: 0.3 },
+        size: { value: 2 },
+        move: { speed: 0.6, direction: 'none', random: true, straight: false },
+        links: { enable: true, color: '#ff0033', opacity: 0.15 }
+      },
+      interactivity: { events: { onHover: { enable: true, mode: 'repulse' } } }
+    });
+
+    // ========== FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyABFTZwRSKtSB2uTvNMk_rzE88CVOCqztI",
+      authDomain: "gerador-de-sensi-c8ba0.firebaseapp.com",
+      databaseURL: "https://gerador-de-sensi-c8ba0-default-rtdb.firebaseio.com",
+      projectId: "gerador-de-sensi-c8ba0",
+      storageBucket: "gerador-de-sensi-c8ba0.firebasestorage.app",
+      messagingSenderId: "966299667014",
+      appId: "1:966299667014:web:d3db675867f88b7bda5847"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Autenticação anônima
+    auth.signInAnonymously()
+      .then(() => console.log('🔥 Firebase autenticado'))
+      .catch(err => console.warn('Auth:', err));
+
+    // ========== VARIÁVEIS GLOBAIS ==========
+    let totalGen = parseInt(localStorage.getItem('totalGen')) || 0;
+    let currentSensi = null;
+    let reviewsCache = [];
+
+    // ========== DOM ELEMENTS ==========
+    const dpiInput = document.getElementById('dpiInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const copyBtn = document.getElementById('copySensiBtn');
+    const totalGenEl = document.getElementById('totalGen');
+    const totalReviewsEl = document.getElementById('totalReviews');
+    const avgRatingEl = document.getElementById('avgRating');
+    const reviewList = document.getElementById('reviewList');
+    const submitReviewBtn = document.getElementById('submitReviewBtn');
+    const avgDisplay = document.getElementById('avgDisplay');
+    const toast = document.getElementById('toast');
+
+    // ========== TOAST ==========
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ========== ALGORITMO IA - GERA 10 CONFIGURAÇÕES ==========
+    function generateSensiConfigs(dpi) {
+      const base = Math.round(dpi / 5.5);
+      const configs = [];
+
+      // 10 variações inteligentes baseadas no DPI
+      const variations = [
+        { geral: 22, redDot: 8, mira2x: -6, mira4x: -18, awm: -42, olhadinha: 32, botao: 45, cursor: 50, sensiGeral: 60, miraTele: 55 },
+        { geral: 18, redDot: 12, mira2x: -4, mira4x: -15, awm: -38, olhadinha: 28, botao: 50, cursor: 45, sensiGeral: 55, miraTele: 50 },
+        { geral: 25, redDot: 5, mira2x: -8, mira4x: -20, awm: -45, olhadinha: 35, botao: 40, cursor: 55, sensiGeral: 65, miraTele: 60 },
+        { geral: 20, redDot: 10, mira2x: -5, mira4x: -16, awm: -40, olhadinha: 30, botao: 48, cursor: 48, sensiGeral: 58, miraTele: 52 },
+        { geral: 28, redDot: 3, mira2x: -10, mira4x: -22, awm: -48, olhadinha: 38, botao: 42, cursor: 52, sensiGeral: 68, miraTele: 62 },
+        { geral: 15, redDot: 14, mira2x: -2, mira4x: -12, awm: -35, olhadinha: 25, botao: 55, cursor: 42, sensiGeral: 50, miraTele: 45 },
+        { geral: 30, redDot: 2, mira2x: -12, mira4x: -25, awm: -50, olhadinha: 40, botao: 38, cursor: 58, sensiGeral: 70, miraTele: 65 },
+        { geral: 17, redDot: 11, mira2x: -3, mira4x: -14, awm: -37, olhadinha: 27, botao: 52, cursor: 44, sensiGeral: 53, miraTele: 48 },
+        { geral: 23, redDot: 7, mira2x: -7, mira4x: -19, awm: -43, olhadinha: 33, botao: 46, cursor: 51, sensiGeral: 62, miraTele: 57 },
+        { geral: 26, redDot: 4, mira2x: -9, mira4x: -21, awm: -46, olhadinha: 36, botao: 43, cursor: 54, sensiGeral: 66, miraTele: 61 }
+      ];
+
+      variations.forEach((v, i) => {
+        const dpiFactor = dpi / 500;
+        configs.push({
+          id: i + 1,
+          geral: Math.min(200, Math.max(0, Math.round(base + v.geral))),
+          redDot: Math.min(200, Math.max(0, Math.round(base + v.redDot))),
+          mira2x: Math.min(200, Math.max(0, Math.round(base + v.mira2x))),
+          mira4x: Math.min(200, Math.max(0, Math.round(base + v.mira4x))),
+          awm: Math.min(200, Math.max(0, Math.round(base + v.awm))),
+          olhadinha: Math.min(200, Math.max(0, Math.round(base + v.olhadinha))),
+          tamanhoBotao: Math.min(100, Math.max(20, Math.round(v.botao * dpiFactor))),
+          velocidadeCursor: Math.min(100, Math.max(20, Math.round(v.cursor * dpiFactor))),
+          sensiGeral: Math.min(100, Math.max(20, Math.round(v.sensiGeral * dpiFactor))),
+          miraTele: Math.min(100, Math.max(20, Math.round(v.miraTele * dpiFactor)))
+        });
+      });
+
+      return configs;
+    }
+
+    // ========== SORTEAR UMA CONFIGURAÇÃO ==========
+    function getRandomConfig(configs) {
+      const randomIndex = Math.floor(Math.random() * configs.length);
+      return configs[randomIndex];
+    }
+
+    // ========== RENDERIZAR RESULTADO ==========
+    function renderResult(sensi) {
+      currentSensi = sensi;
+
+      let html = `
+        <div style="margin-bottom: 0.5rem; color: #ff4400; font-size: 0.9rem;">
+          <i class="fas fa-dice"></i> Configuração ${sensi.id} de 10 sorteada!
+        </div>
+        <div class="results-grid">
+          <div class="res-item"><div class="label">Geral</div><div class="value">${sensi.geral}</div></div>
+          <div class="res-item"><div class="label">Red Dot</div><div class="value">${sensi.redDot}</div></div>
+          <div class="res-item"><div class="label">2x</div><div class="value">${sensi.mira2x}</div></div>
+          <div class="res-item"><div class="label">4x</div><div class="value">${sensi.mira4x}</div></div>
+          <div class="res-item"><div class="label">AWM</div><div class="value">${sensi.awm}</div></div>
+          <div class="res-item"><div class="label">Olhadinha</div><div class="value">${sensi.olhadinha}</div></div>
+        </div>
+        <div class="sensi-details">
+          <div class="detail-item"><span class="label">Tamanho do Botão</span><span class="value">${sensi.tamanhoBotao}%</span></div>
+          <div class="detail-item"><span class="label">Velocidade do Cursor</span><span class="value">${sensi.velocidadeCursor}%</span></div>
+          <div class="detail-item"><span class="label">Sensibilidade Geral</span><span class="value">${sensi.sensiGeral}%</span></div>
+          <div class="detail-item"><span class="label">Sensibilidade Mira Tele</span><span class="value">${sensi.miraTele}%</span></div>
+        </div>
+      `;
+
+      resultsContainer.innerHTML = html;
+      copyBtn.style.display = 'inline-block';
+    }
+
+    // ========== GERAR SENSI ==========
+    generateBtn.addEventListener('click', function(e) {
+      // Efeito ripple
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+
+      const dpi = parseInt(dpiInput.value);
+      if (isNaN(dpi) || dpi < 100 || dpi > 1000) {
+        showToast('⚠️ DPI inválido! Use valores entre 100 e 1000');
+        return;
+      }
+
+      // Gerar 10 configurações e sortear 1
+      const configs = generateSensiConfigs(dpi);
+      const selected = getRandomConfig(configs);
+      renderResult(selected);
+
+      // Atualizar estatísticas
+      totalGen++;
+      localStorage.setItem('totalGen', totalGen);
+      totalGenEl.textContent = totalGen;
+
+      showToast('✅ Sensibilidade gerada com sucesso!');
+    });
+
+    // ========== COPIAR ==========
+    copyBtn.addEventListener('click', () => {
+      if (!currentSensi) {
+        showToast('⚠️ Nenhuma sensibilidade para copiar');
+        return;
+      }
+      const txt = 
+        `🎯 SENSI GERADA (Config ${currentSensi.id})\n` +
+        `═══════════════════════════\n` +
+        `Geral: ${currentSensi.geral}\n` +
+        `Red Dot: ${currentSensi.redDot}\n` +
+        `2x: ${currentSensi.mira2x}\n` +
+        `4x: ${currentSensi.mira4x}\n` +
+        `AWM: ${currentSensi.awm}\n` +
+        `Olhadinha: ${currentSensi.olhadinha}\n` +
+        `\n📊 CONFIGURAÇÕES EXTRAS:\n` +
+        `Tamanho do Botão: ${currentSensi.tamanhoBotao}%\n` +
+        `Velocidade do Cursor: ${currentSensi.velocidadeCursor}%\n` +
+        `Sensibilidade Geral: ${currentSensi.sensiGeral}%\n` +
+        `Mira Telescópica: ${currentSensi.miraTele}%`;
+
+      navigator.clipboard.writeText(txt)
+        .then(() => showToast('📋 Sensibilidade copiada!'))
+        .catch(() => showToast('❌ Erro ao copiar'));
+    });
+
+    // ========== FIREBASE REVIEWS ==========
+    async function loadReviews() {
+      try {
+        const snapshot = await db.collection('reviews')
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        reviewsCache = [];
+        snapshot.forEach(doc => {
+          reviewsCache.push({ id: doc.id, ...doc.data() });
+        });
+
+        renderReviews();
+        updateStats();
+        console.log('✅ Avaliações carregadas do Firebase:', reviewsCache.length);
+      } catch (e) {
+        console.warn('Erro ao carregar avaliações:', e);
+        // Fallback: dados locais
+        const localReviews = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
+        reviewsCache = localReviews;
+        renderReviews();
+        updateStats();
+        showToast('⚠️ Usando avaliações salvas localmente');
+      }
+    }
+
+    function renderReviews() {
+      if (!reviewsCache || reviewsCache.length === 0) {
+        reviewList.innerHTML = '<p style="color:#666;text-align:center;padding:1rem;">Nenhuma avaliação ainda. Seja o primeiro!</p>';
+        return;
+      }
+
+      let html = '';
+      reviewsCache.forEach(r => {
+        const stars = '★'.repeat(Math.min(5, Math.max(0, r.stars || 0))) + '☆'.repeat(5 - Math.min(5, Math.max(0, r.stars || 0)));
+        const name = r.name || 'Anônimo';
+        const comment = r.comment || 'Sem comentário';
+        const date = r.date ? new Date(r.date).toLocaleString('pt-BR') : 'Data não informada';
+
+        html += `
+          <div class="review-item">
+            <div>
+              <span class="name">${name}</span>
+              <span class="stars">${stars}</span>
+            </div>
+            <div style="margin: 4px 0;">${comment}</div>
+            <div class="date">${date}</div>
+          </div>
+        `;
+      });
+
+      reviewList.innerHTML = html;
+    }
+
+    function updateStats() {
+      const total = reviewsCache.length;
+      totalReviewsEl.textContent = total;
+
+      if (total === 0) {
+        avgRatingEl.textContent = '0.0';
+        avgDisplay.textContent = '★ 0.0 (0 avaliações)';
+        return;
+      }
+
+      const sum = reviewsCache.reduce((a, b) => a + (b.stars || 0), 0);
+      const avg = sum / total;
+      avgRatingEl.textContent = avg.toFixed(1);
+      avgDisplay.textContent = `★ ${avg.toFixed(1)} (${total} avaliações)`;
+    }
+
+    // ========== ENVIAR AVALIAÇÃO ==========
+    submitReviewBtn.addEventListener('click', async function(e) {
+      // Ripple
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+
+      const name = document.getElementById('reviewName').value.trim() || 'Anônimo';
+      const comment = document.getElementById('reviewComment').value.trim() || 'Sem comentário';
+      const stars = parseInt(document.getElementById('reviewStars').value);
+
+      if (stars < 1 || stars > 5) {
+        showToast('⚠️ Selecione uma nota válida');
+        return;
+      }
+
+      // Mostrar loading no botão
+      const originalText = this.innerHTML;
+      this.innerHTML = '<span class="loading-spinner"></span> Enviando...';
+      this.disabled = true;
+
+      try {
+        await db.collection('reviews').add({
+          name,
+          comment,
+          stars,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          date: new Date().toISOString()
+        });
+
+        showToast('⭐ Avaliação enviada com sucesso!');
+        document.getElementById('reviewComment').value = '';
+        document.getElementById('reviewName').value = '';
+
+        // Recarregar avaliações
+        await loadReviews();
+
+        // Confetti
+        for (let i = 0; i < 40; i++) {
+          setTimeout(() => {
+            const c = document.createElement('div');
+            const colors = ['#ff0033', '#ffd700', '#ff4400', '#ff6b6b', '#ffd93d'];
+            c.style.cssText = `
+              position: fixed;
+              width: ${6 + Math.random() * 8}px;
+              height: ${6 + Math.random() * 8}px;
+              background: ${colors[Math.floor(Math.random() * colors.length)]};
+              border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+              left: ${Math.random() * 100}vw;
+              top: -10px;
+              pointer-events: none;
+              z-index: 9999;
+              animation: fall ${1 + Math.random() * 2}s linear forwards;
+            `;
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3000);
+          }, i * 40);
+        }
+      } catch (e) {
+        console.error('Erro ao enviar avaliação:', e);
+        // Fallback: salvar localmente
+        try {
+          const fallback = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
+          fallback.push({ name, comment, stars, date: new Date().toISOString() });
+          localStorage.setItem('reviews_fallback', JSON.stringify(fallback));
+          reviewsCache = fallback;
+          renderReviews();
+          updateStats();
+          showToast('⭐ Avaliação salva localmente!');
+          document.getElementById('reviewComment').value = '';
+          document.getElementById('reviewName').value = '';
+        } catch (fallbackError) {
+          showToast('❌ Erro ao salvar avaliação');
+        }
+      } finally {
+        this.innerHTML = originalText;
+        this.disabled = false;
+      }
+    });
+
+    // ========== INICIALIZAÇÃO ==========
+    totalGenEl.textContent = totalGen;
+    loadReviews();
+
+    // Simular usuários online
+    setInterval(() => {
+      document.getElementById('onlineUsers').textContent = Math.floor(20 + Math.random() * 50);
+    }, 5000);
+
+    // ========== ESTILO CONFETTI ==========
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      @keyframes fall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    console.log('🚀 GERADOR DE LIKE - DOCKAZE carregado!');
+    console.log('📊 Firebase:', firebaseConfig.projectId);
+  </script>
+</body>
+</html>
