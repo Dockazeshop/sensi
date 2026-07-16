@@ -159,7 +159,6 @@
   <div id="toast">✨ Sensibilidade copiada!</div>
 
   <div class="container">
-    <!-- TÍTULO CORRIGIDO -->
     <div class="header-center" data-aos="fade-down">
       <div class="neon-pulse">GERADOR DE SENSI</div>
     </div>
@@ -246,7 +245,7 @@
       interactivity: { events: { onHover: { enable: true, mode: 'repulse' } } }
     });
 
-    // ========== FIREBASE ==========
+    // ========== FIREBASE CONFIG ==========
     const firebaseConfig = {
       apiKey: "AIzaSyABFTZwRSKtSB2uTvNMk_rzE88CVOCqztI",
       authDomain: "gerador-de-sensi-c8ba0.firebaseapp.com",
@@ -257,13 +256,25 @@
       appId: "1:966299667014:web:d3db675867f88b7bda5847"
     };
 
+    // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    // ========== AUTENTICAÇÃO ANÔNIMA ==========
     auth.signInAnonymously()
-      .then(() => console.log('🔥 Firebase autenticado'))
-      .catch(err => console.warn('Auth:', err));
+      .then(() => {
+        console.log('✅ Firebase autenticado com sucesso!');
+        showToast('🔥 Conectado ao Firebase!');
+        // Carregar avaliações após autenticar
+        loadReviews();
+      })
+      .catch(err => {
+        console.error('❌ Erro na autenticação:', err);
+        showToast('⚠️ Erro ao conectar ao Firebase', true);
+        // Fallback: carregar dados locais
+        loadReviewsFallback();
+      });
 
     // ========== VARIÁVEIS ==========
     let totalGen = parseInt(localStorage.getItem('totalGen')) || 0;
@@ -293,12 +304,11 @@
       toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // ========== ALGORITMO - 10 CONFIGURAÇÕES (VALORES ATÉ 200) ==========
+    // ========== ALGORITMO - 10 CONFIGURAÇÕES ==========
     function generateSensiConfigs(dpi) {
       const base = Math.round(dpi / 4.2);
       const configs = [];
 
-      // 10 variações com valores que chegam até 200
       const variations = [
         { g: 28, rd: 12, m2: -4, m4: -12, aw: -30, oh: 38, bt: 45, cs: 50, sg: 60, mt: 55 },
         { g: 24, rd: 16, m2: -2, m4: -10, aw: -26, oh: 34, bt: 50, cs: 45, sg: 55, mt: 50 },
@@ -343,11 +353,6 @@
       currentSensi = sensi;
 
       const html = `
-        <div style="text-align: center; margin-bottom: 0.5rem;">
-          <span class="badge">
-            <i class="fas fa-dice"></i> Config ${sensi.id} de 10 sorteada!
-          </span>
-        </div>
         <div class="results-grid">
           <div class="res-item"><div class="label">Geral</div><div class="value">${sensi.geral}</div></div>
           <div class="res-item"><div class="label">Red Dot</div><div class="value">${sensi.redDot}</div></div>
@@ -370,7 +375,6 @@
 
     // ========== GERAR ==========
     generateBtn.addEventListener('click', function(e) {
-      // Ripple
       const rect = this.getBoundingClientRect();
       const ripple = document.createElement('span');
       ripple.className = 'ripple';
@@ -395,7 +399,7 @@
       localStorage.setItem('totalGen', totalGen);
       totalGenEl.textContent = totalGen;
 
-      showToast('✅ Sensibilidade gerada! Config ' + selected.id);
+      showToast('✅ Sensibilidade gerada!');
     });
 
     // ========== COPIAR ==========
@@ -406,7 +410,7 @@
       }
 
       const txt = 
-        `🎯 SENSI GERADA (Config ${currentSensi.id})\n` +
+        `🎯 SENSI GERADA\n` +
         `═══════════════════════════\n` +
         `Geral: ${currentSensi.geral}\n` +
         `Red Dot: ${currentSensi.redDot}\n` +
@@ -447,13 +451,20 @@
 
         renderReviews();
         updateStats();
-        console.log('✅ Avaliações carregadas:', reviewsCache.length);
+        console.log('✅ Avaliações carregadas do Firebase:', reviewsCache.length);
       } catch (e) {
         console.warn('Erro ao carregar avaliações:', e);
-        const localReviews = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
-        reviewsCache = localReviews;
-        renderReviews();
-        updateStats();
+        loadReviewsFallback();
+      }
+    }
+
+    function loadReviewsFallback() {
+      const localReviews = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
+      reviewsCache = localReviews;
+      renderReviews();
+      updateStats();
+      if (localReviews.length > 0) {
+        showToast('⚠️ Usando avaliações salvas localmente', true);
       }
     }
 
@@ -496,13 +507,13 @@
       avgDisplay.textContent = `★ ${avg.toFixed(1)} (${total} avaliações)`;
     }
 
-    // ========== ENVIAR AVALIAÇÃO - CORRIGIDO ==========
+    // ========== ENVIAR AVALIAÇÃO ==========
     submitReviewBtn.addEventListener('click', async function(e) {
-      // Evitar múltiplos envios
+      e.preventDefault();
+
       if (isSubmitting) return;
       isSubmitting = true;
 
-      // Ripple
       const rect = this.getBoundingClientRect();
       const ripple = document.createElement('span');
       ripple.className = 'ripple';
@@ -523,12 +534,12 @@
         return;
       }
 
-      // Salvar estado original do botão
       const originalText = this.innerHTML;
       this.innerHTML = '<span class="loading-spinner"></span> Enviando...';
       this.disabled = true;
 
       try {
+        // Tentar salvar no Firebase
         await db.collection('reviews').add({
           name,
           comment,
@@ -564,12 +575,18 @@
             setTimeout(() => c.remove(), 3000);
           }, i * 40);
         }
-      } catch (e) {
-        console.error('Erro ao enviar avaliação:', e);
+      } catch (error) {
+        console.error('Erro Firebase:', error);
+        
         // Fallback: salvar localmente
         try {
           const fallback = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
-          fallback.push({ name, comment, stars, date: new Date().toISOString() });
+          fallback.push({
+            name,
+            comment,
+            stars,
+            date: new Date().toISOString()
+          });
           localStorage.setItem('reviews_fallback', JSON.stringify(fallback));
           reviewsCache = fallback;
           renderReviews();
@@ -581,7 +598,6 @@
           showToast('❌ Erro ao salvar avaliação', true);
         }
       } finally {
-        // Restaurar botão
         this.innerHTML = originalText;
         this.disabled = false;
         isSubmitting = false;
@@ -590,7 +606,11 @@
 
     // ========== INICIALIZAÇÃO ==========
     totalGenEl.textContent = totalGen;
-    loadReviews();
+
+    // Se já estiver autenticado, carrega as avaliações
+    if (auth.currentUser) {
+      loadReviews();
+    }
 
     setInterval(() => {
       document.getElementById('onlineUsers').textContent = Math.floor(20 + Math.random() * 50);
@@ -607,6 +627,8 @@
     document.head.appendChild(styleSheet);
 
     console.log('🚀 GERADOR DE SENSI - DOCKAZE carregado!');
+    console.log('🔥 Firebase:', firebaseConfig.projectId);
+    console.log('👤 Usuário autenticado:', auth.currentUser ? 'Sim' : 'Não');
   </script>
 </body>
 </html>
