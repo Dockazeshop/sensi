@@ -2,73 +2,124 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>GERADOR DE SENSI · DOCKAZE</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #0b0b0b;
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
       color: #fff;
-      padding: 20px;
+      cursor: none;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
       min-height: 100vh;
     }
-    .container { max-width: 700px; margin: 0 auto; }
-    .glass {
-      background: rgba(255,255,255,0.03);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,0,50,0.15);
-      border-radius: 32px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    .cursor-glow {
+      width: 20px; height: 20px;
+      background: radial-gradient(circle, #ff003388, transparent 70%);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      transform: translate(-50%, -50%);
+      transition: width 0.15s, height 0.15s;
     }
-    .neon-border { border: 1px solid #ff003366; box-shadow: 0 0 20px #ff003344; }
-    .text-center { text-align: center; }
+    .cursor-glow.active { width: 50px; height: 50px; background: radial-gradient(circle, #ff444466, transparent 70%); }
+    #scroll-progress {
+      position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, #ff0033, #ff4400);
+      z-index: 9998; width: 0%; transition: width 0.1s;
+    }
+    #loader {
+      position: fixed; inset: 0; background: #0b0b0b; z-index: 10000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.6s;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .loader-ring {
+      width: 70px; height: 70px; border-radius: 50%; border: 6px solid transparent;
+      border-top: 6px solid #ff0033; border-right: 6px solid #ff4400;
+      animation: spin 1s linear infinite; box-shadow: 0 0 30px #ff003355;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .glass {
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,0,50,0.15);
+      border-radius: 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .neon-border { border: 1px solid #ff003366; box-shadow: 0 0 20px #ff003344, inset 0 0 20px #ff003311; }
+    .container { max-width: 700px; margin: 0 auto; padding: 1rem; }
+    .header-center { text-align: center; padding: 1rem 0 0.5rem; }
     .neon-pulse {
       font-size: 2.8rem;
       font-weight: 800;
+      letter-spacing: 2px;
       background: linear-gradient(135deg, #ff0033, #ff4400, #cc0033);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px #ff003388;
-      animation: pulseGlow 2s infinite alternate;
+      text-shadow: 0 0 30px #ff003388, 0 0 60px #ff440044;
+      animation: pulseGlow 3s infinite alternate;
     }
     @keyframes pulseGlow {
-      0% { text-shadow: 0 0 20px #ff003366; }
-      100% { text-shadow: 0 0 60px #ff0033cc; }
+      0% { text-shadow: 0 0 20px #ff003366, 0 0 40px #ff440033; }
+      100% { text-shadow: 0 0 40px #ff0033cc, 0 0 80px #ff440066; }
     }
+    .card-sensi { max-width: 600px; margin: 0 auto; text-align: center; }
+    .card-sensi label { font-weight: 600; color: #ccc; display: block; margin-bottom: 0.5rem; }
     .dpi-input {
       width: 100%;
-      padding: 1rem;
+      padding: 0.9rem;
       border-radius: 60px;
       border: 1px solid #ff003355;
       background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       text-align: center;
       outline: none;
+      transition: 0.3s;
     }
     .dpi-input:focus { border-color: #ff4400; box-shadow: 0 0 30px #ff440044; }
     .btn-primary {
+      margin-top: 1.5rem;
       padding: 0.9rem 2.8rem;
       border: none;
       border-radius: 60px;
       background: linear-gradient(135deg, #ff0033, #cc0022);
       color: #fff;
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       box-shadow: 0 0 30px #ff003366;
-      cursor: pointer;
       transition: 0.3s;
-      margin-top: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      width: 100%;
+      touch-action: manipulation;
     }
-    .btn-primary:hover { transform: scale(1.04); box-shadow: 0 0 50px #ff0033aa; }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary:active { transform: scale(0.96); }
+    .btn-primary:hover { transform: scale(1.02); box-shadow: 0 0 50px #ff0033aa; }
+    .btn-primary .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); animation: rippleAnim 0.6s linear; }
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+    .btn-primary .shine {
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.08), transparent);
+      transform: rotate(25deg); animation: shineMove 4s infinite;
+    }
+    @keyframes shineMove {
+      0% { transform: translateX(-100%) rotate(25deg); }
+      100% { transform: translateX(100%) rotate(25deg); }
+    }
     .results-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -77,67 +128,38 @@
     }
     .res-item {
       background: rgba(255,255,255,0.02);
-      padding: 0.8rem;
+      backdrop-filter: blur(6px);
+      padding: 0.7rem 0.4rem;
       border-radius: 16px;
       border: 1px solid #ff003344;
       text-align: center;
+      transition: 0.3s;
+      box-shadow: 0 4px 20px #00000055;
     }
-    .res-item .label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; }
-    .res-item .value { font-size: 1.8rem; font-weight: 700; color: #ff4400; }
+    .res-item:active { transform: scale(0.95); }
+    .res-item .label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    .res-item .value { font-size: 1.8rem; font-weight: 700; color: #fff; text-shadow: 0 0 20px #ff003366; }
     .copy-btn {
-      padding: 0.5rem 2rem;
+      margin: 0.5rem 0 0;
+      padding: 0.6rem 2rem;
       border: 1px solid #ff4400;
       border-radius: 40px;
       background: transparent;
       color: #ff4400;
       font-weight: 600;
-      cursor: pointer;
       transition: 0.3s;
-    }
-    .copy-btn:hover { background: #ff440022; box-shadow: 0 0 30px #ff440044; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-    .stat-card {
-      padding: 1rem;
-      text-align: center;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid #ff003322;
-    }
-    .stat-card .num { font-size: 1.8rem; font-weight: 700; color: #ff0033; }
-    .stat-card .label { font-size: 0.8rem; color: #aaa; }
-    .review-form input, .review-form textarea, .review-form select {
+      cursor: none;
       width: 100%;
-      margin: 0.3rem 0;
-      padding: 0.7rem;
-      border-radius: 16px;
-      border: 1px solid #ff003344;
-      background: #1a1a1a;
-      color: #fff;
+      touch-action: manipulation;
     }
-    .review-form input::placeholder, .review-form textarea::placeholder { color: #666; }
-    .review-form .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-    .review-form .row select { width: auto; flex: 1; }
-    .review-list { max-height: 300px; overflow-y: auto; margin-top: 1rem; }
-    .review-item {
-      background: rgba(255,255,255,0.03);
-      padding: 0.8rem;
-      border-radius: 12px;
-      margin-bottom: 0.5rem;
-      border-left: 3px solid #ff4400;
-    }
-    .review-item .stars { color: #ffd700; }
-    .review-item .date { font-size: 0.7rem; color: #888; }
-    .review-item .name { font-weight: 700; }
+    .copy-btn:active { transform: scale(0.95); }
+    .copy-btn:hover { background: #ff440022; box-shadow: 0 0 30px #ff440044; }
     .sensi-details {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.5rem;
       margin: 1rem 0;
+      text-align: left;
     }
     .sensi-details .detail-item {
       display: flex;
@@ -145,8 +167,149 @@
       padding: 0.3rem 0;
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
-    .sensi-details .detail-item .label { color: #aaa; }
-    .sensi-details .detail-item .value { color: #ff4400; font-weight: 600; }
+    .sensi-details .detail-item .label { color: #aaa; font-size: 0.8rem; }
+    .sensi-details .detail-item .value { color: #ff4400; font-weight: 600; font-size: 0.9rem; }
+
+    /* CARDS DE MOTIVAÇÃO + DICA */
+    .motivation-card {
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,68,0,0.08), rgba(255,0,51,0.05));
+      border: 1px solid rgba(255,68,0,0.2);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.6s ease;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .motivation-card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .motivation-card .frase {
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff4400, #ff0033);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #ff003366;
+      margin-bottom: 0.5rem;
+    }
+    .motivation-card .frase i {
+      -webkit-text-fill-color: initial;
+      color: #ffd700;
+      margin-right: 8px;
+    }
+    .motivation-card .dica {
+      font-size: 0.85rem;
+      color: #aaa;
+      line-height: 1.4;
+      padding-left: 4px;
+    }
+    .motivation-card .dica i {
+      color: #ff4400;
+      margin-right: 6px;
+      -webkit-text-fill-color: #ff4400;
+    }
+
+    /* LINKTREE BUTTON */
+    .linktree-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 0.9rem 1.5rem;
+      border-radius: 60px;
+      background: linear-gradient(135deg, #00cc66, #00994d);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      transition: 0.3s;
+      box-shadow: 0 0 40px rgba(0,204,102,0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,204,102,0.3);
+      width: 100%;
+      touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+    }
+    .linktree-btn:active { transform: scale(0.96); }
+    .linktree-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 60px rgba(0,204,102,0.5);
+    }
+    .linktree-btn i { font-size: 1.5rem; color: #fff; }
+    .linktree-btn .linktree-icon {
+      width: 32px;
+      height: 32px;
+      background: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #00994d;
+      font-size: 0.8rem;
+    }
+    .linktree-btn .blur-effect {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(0,204,102,0.15), transparent 70%);
+      border-radius: 60px;
+      filter: blur(20px);
+      pointer-events: none;
+    }
+    .linktree-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* REDES SOCIAIS */
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+    .social-icons a {
+      color: #888;
+      font-size: 2rem;
+      transition: 0.3s;
+      text-decoration: none;
+      touch-action: manipulation;
+    }
+    .social-icons a:active { transform: scale(0.85); }
+    .social-icons a:hover {
+      color: #ff0033;
+      transform: translateY(-3px);
+      text-shadow: 0 0 30px #ff003366;
+    }
+    .social-icons .instagram:hover { color: #E4405F; text-shadow: 0 0 30px #E4405F66; }
+    .social-icons .youtube:hover { color: #FF0000; text-shadow: 0 0 30px #FF000066; }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 0 1rem;
+      border-top: 1px solid rgba(255,0,51,0.2);
+      margin-top: 1rem;
+    }
+    .dockaze {
+      font-weight: 800;
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, #ff0033, #ff4400, #cc0033);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #ff003388;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .verified-icon { color: #ff0033; font-size: 1rem; -webkit-text-fill-color: #ff0033; }
     #toast {
       position: fixed;
       bottom: 30px;
@@ -162,208 +325,166 @@
       opacity: 0;
       transition: 0.4s;
       z-index: 999;
+      font-size: 0.9rem;
+      white-space: nowrap;
     }
     #toast.show { opacity: 1; bottom: 50px; }
-    .loading-spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 0.8s linear infinite;
-      margin-right: 10px;
-      vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    footer { text-align: center; padding: 1.5rem 0; border-top: 1px solid #ff003344; margin-top: 2rem; }
-    .dockaze {
-      font-weight: 800;
-      font-size: 1.4rem;
-      background: linear-gradient(135deg, #ff0033, #ff4400);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 0.3rem 1rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      margin-top: 0.5rem;
-    }
-    .status-online { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8855; }
-    .status-offline { background: #ff880022; color: #ff8800; border: 1px solid #ff880055; }
-    .status-error { background: #ff003322; color: #ff0033; border: 1px solid #ff003355; }
-    .debug-box {
-      background: #1a1a1a;
-      padding: 0.8rem;
-      border-radius: 12px;
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      color: #888;
-      max-height: 100px;
-      overflow-y: auto;
-      font-family: monospace;
-      border: 1px solid #333;
-    }
+    #tsparticles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0b0b0b; }
+    ::-webkit-scrollbar-thumb { background: #ff0033; border-radius: 10px; }
+
     @media (max-width: 640px) {
       .neon-pulse { font-size: 2rem; }
       .results-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .sensi-details { grid-template-columns: 1fr; }
+      #toast { white-space: normal; max-width: 90%; font-size: 0.8rem; }
+      .social-icons a { font-size: 1.8rem; gap: 1.5rem; }
+      .motivation-card .frase { font-size: 0.95rem; }
+      .motivation-card .dica { font-size: 0.8rem; }
     }
   </style>
 </head>
 <body>
+  <div id="loader"><div class="loader-ring"></div><p style="margin-top:1rem;color:#888;">Carregando...</p></div>
+  <div id="scroll-progress"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <div id="tsparticles"></div>
   <div id="toast">✨ Sensibilidade copiada!</div>
 
   <div class="container">
-    <div class="text-center glass neon-border" style="padding: 1.5rem;">
+    <!-- TOPO -->
+    <div class="header-center" data-aos="fade-down">
       <div class="neon-pulse">GERADOR DE SENSI</div>
-      <div style="margin-top: 0.5rem;">
-        <span id="firebaseStatus" class="status-badge status-offline">⏳ Conectando...</span>
-      </div>
     </div>
 
-    <div class="glass neon-border">
-      <div style="text-align: center;">
-        <label style="font-weight: 600; color: #ccc; display: block; margin-bottom: 0.5rem;">
-          <i class="fas fa-mouse-pointer" style="color: #ff0033;"></i> Digite seu DPI
-        </label>
-        <input type="number" id="dpiInput" class="dpi-input" placeholder="100 – 1000" min="100" max="1000" value="400">
-        <button class="btn-primary" id="generateBtn">
-          <i class="fas fa-random"></i> GERAR SENSIBILIDADE
-        </button>
-      </div>
-      <div id="resultsContainer" style="margin-top: 1.5rem;"></div>
-      <div style="text-align: center;">
-        <button class="copy-btn" id="copySensiBtn" style="display:none;">
-          <i class="fas fa-copy"></i> COPIAR SENSI
-        </button>
-      </div>
-    </div>
+    <!-- CARD PRINCIPAL -->
+    <div class="glass neon-border card-sensi" data-aos="flip-up">
+      <label><i class="fas fa-mouse-pointer" style="color:#ff0033;"></i> Digite seu DPI</label>
+      <input type="number" id="dpiInput" class="dpi-input" placeholder="100 – 1000" min="100" max="1000" value="400">
+      <button class="btn-primary" id="generateBtn">
+        <span class="shine"></span>
+        <i class="fas fa-random"></i> GERAR SENSIBILIDADE
+      </button>
+      <div id="resultsContainer" style="margin-top:1.5rem;"></div>
+      <button class="copy-btn" id="copySensiBtn" style="display:none;">
+        <i class="fas fa-copy"></i> COPIAR SENSI
+      </button>
 
-    <div class="stats-grid">
-      <div class="stat-card"><div class="num" id="totalGen">0</div><div class="label">Gerações</div></div>
-      <div class="stat-card"><div class="num" id="totalReviews">0</div><div class="label">Avaliações</div></div>
-      <div class="stat-card"><div class="num" id="avgRating">0.0</div><div class="label">Média ★</div></div>
-      <div class="stat-card"><div class="num" id="onlineUsers">42</div><div class="label">Online</div></div>
-    </div>
-
-    <div class="glass neon-border">
-      <h3 style="margin-bottom: 1rem;">
-        <i class="fas fa-star" style="color: #ffd700;"></i> Avaliações
-        <span id="avgDisplay" style="font-size: 0.9rem; color: #aaa; margin-left: 0.5rem;"></span>
-      </h3>
-      <div class="review-form">
-        <input type="text" id="reviewName" placeholder="Ex: Lucas">
-        <textarea id="reviewComment" placeholder="Digite seu comentário..." rows="2"></textarea>
-        <div class="row">
-          <span>Nota: </span>
-          <select id="reviewStars">
-            <option value="5">★★★★★</option>
-            <option value="4">★★★★</option>
-            <option value="3">★★★</option>
-            <option value="2">★★</option>
-            <option value="1">★</option>
-          </select>
-          <button class="btn-primary" id="submitReviewBtn" style="padding: 0.5rem 1.5rem; font-size: 0.9rem; margin-top: 0;">
-            <i class="fas fa-paper-plane"></i> Enviar
-          </button>
+      <!-- CARD DE MOTIVAÇÃO + DICA -->
+      <div id="motivationCard" class="motivation-card">
+        <div class="frase" id="fraseDisplay">
+          <i class="fas fa-fire"></i> TREINE POIS A SENSI NÃO FAZ MILAGRE
+        </div>
+        <div class="dica" id="dicaDisplay">
+          <i class="fas fa-lightbulb"></i> Treine 20 a 40 minutos por dia no modo treino para criar memória muscular
         </div>
       </div>
-      <div class="review-list" id="reviewList">
-        <p style="color: #666; text-align: center; padding: 1rem;">Carregando avaliações...</p>
-      </div>
-      <!-- DEBUG -->
-      <div class="debug-box" id="debugBox">
-        📡 Aguardando ações...
-      </div>
     </div>
 
+    <!-- LINKTREE -->
+    <div class="glass neon-border linktree-wrapper" data-aos="fade-up">
+      <a href="https://linktr.ee/DOCKAZE" target="_blank" class="linktree-btn" id="linktreeBtn">
+        <div class="blur-effect"></div>
+        <div class="linktree-icon">LT</div>
+        <span>Acesse nosso Linktree</span>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- RODAPÉ COM REDES SOCIAIS -->
     <footer>
-      <div style="height: 2px; width: 60%; margin: 0 auto 1rem; background: linear-gradient(90deg, transparent, #ff0033, transparent);"></div>
-      <p style="color: #888; font-size: 0.9rem;">© 2026 Todos os direitos reservados.</p>
-      <div style="margin-top: 0.3rem;">
-        <span style="color: #888;">Desenvolvido por </span>
-        <span class="dockaze">DOCKAZE <i class="fas fa-check-circle" style="color: #ff0033; -webkit-text-fill-color: #ff0033;"></i></span>
+      <div class="social-icons">
+        <a href="https://www.instagram.com/dockaze_ff?igsh=dzh3YWhwcHZwcmFp" target="_blank" class="instagram" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://youtube.com/@dockaze?si=ASOn8YnUf3zSOH-3" target="_blank" class="youtube" aria-label="YouTube">
+          <i class="fab fa-youtube"></i>
+        </a>
+      </div>
+
+      <div style="height:1px;width:60%;margin:1rem auto;background:linear-gradient(90deg,transparent,#ff0033,transparent);"></div>
+      <p style="color:#666;font-size:0.8rem;">© 2026 Todos os direitos reservados.</p>
+      <div style="margin-top:0.3rem;">
+        <span style="color:#666;font-size:0.8rem;">Desenvolvido por </span>
+        <span class="dockaze">DOCKAZE <i class="fas fa-check-circle verified-icon"></i></span>
       </div>
     </footer>
   </div>
 
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    // ============================================================
-    //  FIREBASE CONFIG
-    // ============================================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyABFTZwRSKtSB2uTvNMk_rzE88CVOCqztI",
-      authDomain: "gerador-de-sensi-c8ba0.firebaseapp.com",
-      databaseURL: "https://gerador-de-sensi-c8ba0-default-rtdb.firebaseio.com",
-      projectId: "gerador-de-sensi-c8ba0",
-      storageBucket: "gerador-de-sensi-c8ba0.firebasestorage.app",
-      messagingSenderId: "966299667014",
-      appId: "1:966299667014:web:d3db675867f88b7bda5847"
-    };
+    // ========== INICIALIZAÇÕES ==========
+    AOS.init({ duration: 600, once: false, mirror: true });
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+    window.addEventListener('load', () => {
+      document.getElementById('loader').classList.add('hidden');
+    });
 
-    // ============================================================
-    //  DEBUG
-    // ============================================================
-    const debugBox = document.getElementById('debugBox');
-    
-    function addDebug(msg, isError = false) {
-      const time = new Date().toLocaleTimeString();
-      const prefix = isError ? '❌' : '✅';
-      debugBox.innerHTML = `[${time}] ${prefix} ${msg}\n` + debugBox.innerHTML;
-      if (debugBox.children.length > 20) {
-        debugBox.removeChild(debugBox.lastChild);
-      }
-      console.log(`[${time}] ${prefix} ${msg}`);
-    }
+    window.addEventListener('scroll', () => {
+      let scroll = document.documentElement.scrollTop || document.body.scrollTop;
+      let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      document.getElementById('scroll-progress').style.width = (scroll / height) * 100 + '%';
+    });
 
-    // ============================================================
-    //  VARIÁVEIS
-    // ============================================================
+    const cursor = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.addEventListener('mousedown', () => cursor.classList.add('active'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+
+    // ========== PARTÍCULAS ==========
+    tsParticles.load('tsparticles', {
+      particles: {
+        number: { value: 50 },
+        color: { value: ['#ff0033', '#ff4400', '#cc0033'] },
+        opacity: { value: 0.25 },
+        size: { value: 2 },
+        move: { speed: 0.4, direction: 'none', random: true, straight: false },
+        links: { enable: true, color: '#ff0033', opacity: 0.1 }
+      },
+      interactivity: { events: { onHover: { enable: true, mode: 'repulse' } } }
+    });
+
+    // ========== FRASES MOTIVACIONAIS ==========
+    const frases = [
+      { frase: '🔥 TREINE POIS A SENSI NÃO FAZ MILAGRE', dica: 'Treine 20 a 40 minutos por dia no modo treino para criar memória muscular [citation:3]' },
+      { frase: '💪 A SENSI É O MAPA, O TREINO É A CAMINHADA', dica: 'Cada partida é um reto, e você nasceu para enfrentá-los [citation:2]' },
+      { frase: '🎯 NÃO ADIANTA TER A MELHOR SENSI SEM TREINO', dica: 'Disparar em pequenas rajadas melhora a estabilidade e permite corrigir o recuo [citation:1]' },
+      { frase: '🚀 SENSI BOA + TREINO = RANK UP', dica: 'Ajuste a sensibilidade aos poucos, nunca tudo de uma vez. Cada celular responde diferente [citation:3]' },
+      { frase: '🏆 CONFIE NA SENSI, MAS CONFIE MAIS NO SEU TREINO', dica: 'Puxe levemente a mira para baixo ao atirar para compensar o recuo natural das armas [citation:6]' },
+      { frase: '⚡ A SENSI AJUDA, MAS O TREINO TE FAZ CAMPEÃO', dica: 'Treine com diferentes armas no campo de treinamento para entender o recuo de cada uma [citation:4]' },
+      { frase: '🔥 VOCÊ É O DESIGNER DO SEU PRÓPRIO DESTINO', dica: 'Ajuste HUD, botões e sensibilidade conforme seu estilo de jogo [citation:11]' },
+      { frase: '🎯 MIS MOVIMENTOS NÃO SE PREDIZEM, SE TEMEM', dica: 'Pratique movimentação e posicionamento: saber se proteger é tão importante quanto atirar bem [citation:10]' },
+      { frase: '💀 O MAIOR DESESPERO DOS INIMIGOS É SUA VITÓRIA', dica: 'Grave suas partidas, detecte erros e mantenha rotinas constantes de prática [citation:1]' },
+      { frase: '🏆 APRENDA COM CADA DERROTA, ELA É SUA ARMA SECRETA', dica: 'Analise suas mortes e observe os padrões dos adversários [citation:10]' }
+    ];
+
+    // ========== VARIÁVEIS ==========
     let totalGen = parseInt(localStorage.getItem('totalGen')) || 0;
     let currentSensi = null;
-    let isSubmitting = false;
-    let reviewsCache = [];
-    let isFirebaseConnected = false;
 
-    // ============================================================
-    //  DOM
-    // ============================================================
+    // ========== DOM ==========
     const dpiInput = document.getElementById('dpiInput');
     const generateBtn = document.getElementById('generateBtn');
     const resultsContainer = document.getElementById('resultsContainer');
     const copyBtn = document.getElementById('copySensiBtn');
-    const totalGenEl = document.getElementById('totalGen');
-    const totalReviewsEl = document.getElementById('totalReviews');
-    const avgRatingEl = document.getElementById('avgRating');
-    const reviewList = document.getElementById('reviewList');
-    const submitReviewBtn = document.getElementById('submitReviewBtn');
-    const avgDisplay = document.getElementById('avgDisplay');
     const toast = document.getElementById('toast');
-    const firebaseStatus = document.getElementById('firebaseStatus');
+    const motivationCard = document.getElementById('motivationCard');
+    const fraseDisplay = document.getElementById('fraseDisplay');
+    const dicaDisplay = document.getElementById('dicaDisplay');
 
-    // ============================================================
-    //  TOAST
-    // ============================================================
-    function showToast(msg, isError = false) {
+    // ========== TOAST ==========
+    function showToast(msg) {
       toast.textContent = msg;
-      toast.style.borderColor = isError ? '#ff0033' : '#ff4400';
       toast.classList.add('show');
       clearTimeout(toast._timeout);
-      toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+      toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // ============================================================
-    //  ALGORITMO - 10 CONFIGURAÇÕES
-    // ============================================================
+    // ========== ALGORITMO - 10 CONFIGURAÇÕES ==========
     function generateSensiConfigs(dpi) {
       const base = Math.round(dpi / 4.2);
       const configs = [];
@@ -430,14 +551,30 @@
       copyBtn.style.display = 'inline-block';
     }
 
-    // ============================================================
-    //  GERAR SENSI
-    // ============================================================
-    generateBtn.addEventListener('click', function() {
-      const dpi = parseInt(dpiInput.value);
+    // ========== MOSTRAR FRASE + DICA ALEATÓRIA ==========
+    function showRandomMotivation() {
+      const random = frases[Math.floor(Math.random() * frases.length)];
+      fraseDisplay.innerHTML = random.frase;
+      dicaDisplay.innerHTML = `<i class="fas fa-lightbulb"></i> ${random.dica}`;
+      motivationCard.classList.add('show');
+    }
 
+    // ========== GERAR ==========
+    generateBtn.addEventListener('click', function(e) {
+      // Ripple
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+
+      const dpi = parseInt(dpiInput.value);
       if (isNaN(dpi) || dpi < 100 || dpi > 1000) {
-        showToast('⚠️ DPI inválido! Use 100-1000', true);
+        showToast('⚠️ DPI inválido! Use 100-1000');
         return;
       }
 
@@ -447,22 +584,21 @@
 
       totalGen++;
       localStorage.setItem('totalGen', totalGen);
-      totalGenEl.textContent = totalGen;
+
+      // Mostrar frase + dica aleatória
+      showRandomMotivation();
 
       showToast('✅ Sensibilidade gerada!');
-      addDebug(`DPI ${dpi} - Config ${selected.id} gerada`);
     });
 
-    // ============================================================
-    //  COPIAR
-    // ============================================================
+    // ========== COPIAR ==========
     copyBtn.addEventListener('click', () => {
       if (!currentSensi) {
-        showToast('⚠️ Nenhuma sensibilidade para copiar', true);
+        showToast('⚠️ Nenhuma sensibilidade para copiar');
         return;
       }
 
-      const txt = 
+      const txt =
         `🎯 SENSI GERADA\n` +
         `═══════════════════════════\n` +
         `Geral: ${currentSensi.geral}\n` +
@@ -488,230 +624,30 @@
           ta.remove();
           showToast('📋 Sensibilidade copiada!');
         });
-      addDebug('Sensibilidade copiada');
     });
 
-    // ============================================================
-    //  FIREBASE - AUTENTICAÇÃO
-    // ============================================================
-    addDebug('🔄 Iniciando autenticação...');
-
-    auth.signInAnonymously()
-      .then(() => {
-        isFirebaseConnected = true;
-        firebaseStatus.className = 'status-badge status-online';
-        firebaseStatus.innerHTML = '✅ Firebase Online';
-        addDebug('✅ Autenticado com sucesso!');
-        loadReviews();
-      })
-      .catch(err => {
-        isFirebaseConnected = false;
-        firebaseStatus.className = 'status-badge status-error';
-        firebaseStatus.innerHTML = '⚠️ Firebase Offline';
-        addDebug(`❌ Erro na autenticação: ${err.message}`, true);
-        loadReviewsFallback();
-      });
-
-    // ============================================================
-    //  FIREBASE - REVIEWS
-    // ============================================================
-    async function loadReviews() {
-      try {
-        addDebug('📥 Carregando avaliações...');
-        const snapshot = await db.collection('reviews')
-          .orderBy('timestamp', 'desc')
-          .get();
-
-        reviewsCache = [];
-        snapshot.forEach(doc => {
-          reviewsCache.push({ id: doc.id, ...doc.data() });
-        });
-
-        renderReviews();
-        updateStats();
-        addDebug(`✅ ${reviewsCache.length} avaliações carregadas`);
-      } catch (e) {
-        addDebug(`❌ Erro ao carregar: ${e.message}`, true);
-        loadReviewsFallback();
-      }
-    }
-
-    function loadReviewsFallback() {
-      addDebug('📥 Usando dados locais (fallback)');
-      const localReviews = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
-      reviewsCache = localReviews;
-      renderReviews();
-      updateStats();
-      if (localReviews.length > 0) {
-        addDebug(`📦 ${localReviews.length} avaliações locais carregadas`);
-      }
-    }
-
-    function renderReviews() {
-      if (!reviewsCache || reviewsCache.length === 0) {
-        reviewList.innerHTML = '<p style="color:#666;text-align:center;padding:1rem;">Nenhuma avaliação ainda. Seja o primeiro!</p>';
-        return;
-      }
-
-      let html = '';
-      reviewsCache.forEach(r => {
-        const stars = '★'.repeat(Math.min(5, Math.max(0, r.stars || 0))) + '☆'.repeat(5 - Math.min(5, Math.max(0, r.stars || 0)));
-        html += `
-          <div class="review-item">
-            <div>
-              <span class="name">${r.name || 'Anônimo'}</span>
-              <span class="stars">${stars}</span>
-            </div>
-            <div style="margin:4px 0;">${r.comment || 'Sem comentário'}</div>
-            <div class="date">${r.date ? new Date(r.date).toLocaleString('pt-BR') : ''}</div>
-          </div>
-        `;
-      });
-      reviewList.innerHTML = html;
-    }
-
-    function updateStats() {
-      const total = reviewsCache.length;
-      totalReviewsEl.textContent = total;
-
-      if (total === 0) {
-        avgRatingEl.textContent = '0.0';
-        avgDisplay.textContent = '★ 0.0 (0 avaliações)';
-        return;
-      }
-
-      const sum = reviewsCache.reduce((a, b) => a + (b.stars || 0), 0);
-      const avg = sum / total;
-      avgRatingEl.textContent = avg.toFixed(1);
-      avgDisplay.textContent = `★ ${avg.toFixed(1)} (${total} avaliações)`;
-    }
-
-    // ============================================================
-    //  ENVIAR AVALIAÇÃO - COM DEBUG DETALHADO
-    // ============================================================
-    submitReviewBtn.addEventListener('click', async function(e) {
-      e.preventDefault();
-
-      if (isSubmitting) {
-        addDebug('⏳ Aguarde, já está enviando...');
-        return;
-      }
-
-      const name = document.getElementById('reviewName').value.trim() || 'Anônimo';
-      const comment = document.getElementById('reviewComment').value.trim() || 'Sem comentário';
-      const stars = parseInt(document.getElementById('reviewStars').value);
-
-      addDebug(`📝 Preparando avaliação: ${name} - ${stars}★`);
-
-      if (stars < 1 || stars > 5) {
-        showToast('⚠️ Selecione uma nota válida', true);
-        addDebug('❌ Nota inválida', true);
-        return;
-      }
-
-      isSubmitting = true;
-      const originalText = this.innerHTML;
-      this.innerHTML = '<span class="loading-spinner"></span> Enviando...';
-      this.disabled = true;
-
-      try {
-        addDebug(`📤 Enviando para Firebase...`);
-
-        // TENTAR SALVAR NO FIREBASE
-        const docRef = await db.collection('reviews').add({
-          name,
-          comment,
-          stars,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          date: new Date().toISOString()
-        });
-
-        addDebug(`✅ Avaliação salva no Firebase! ID: ${docRef.id}`);
-        showToast('⭐ Avaliação enviada com sucesso!');
-        
-        document.getElementById('reviewComment').value = '';
-        document.getElementById('reviewName').value = '';
-        
-        await loadReviews();
-
-        // Confetti
-        for (let i = 0; i < 30; i++) {
-          setTimeout(() => {
-            const c = document.createElement('div');
-            const colors = ['#ff0033', '#ffd700', '#ff4400', '#ff6b6b'];
-            c.style.cssText = `
-              position: fixed;
-              width: ${6 + Math.random() * 8}px;
-              height: ${6 + Math.random() * 8}px;
-              background: ${colors[Math.floor(Math.random() * colors.length)]};
-              border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-              left: ${Math.random() * 100}vw;
-              top: -10px;
-              pointer-events: none;
-              z-index: 9999;
-              animation: fall ${1 + Math.random() * 2}s linear forwards;
-            `;
-            document.body.appendChild(c);
-            setTimeout(() => c.remove(), 3000);
-          }, i * 50);
-        }
-
-      } catch (error) {
-        addDebug(`❌ Erro no Firebase: ${error.message}`, true);
-        console.error('Erro detalhado:', error);
-        
-        // FALLBACK: SALVAR LOCALMENTE
-        try {
-          addDebug('📦 Salvando localmente (fallback)...');
-          const fallback = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
-          fallback.push({
-            name,
-            comment,
-            stars,
-            date: new Date().toISOString()
-          });
-          localStorage.setItem('reviews_fallback', JSON.stringify(fallback));
-          reviewsCache = fallback;
-          renderReviews();
-          updateStats();
-          showToast('⭐ Avaliação salva localmente!');
-          document.getElementById('reviewComment').value = '';
-          document.getElementById('reviewName').value = '';
-          addDebug(`✅ Avaliação salva localmente! Total: ${fallback.length}`);
-        } catch (fallbackError) {
-          addDebug(`❌ Erro no fallback: ${fallbackError.message}`, true);
-          showToast('❌ Erro ao salvar avaliação', true);
-        }
-      } finally {
-        this.innerHTML = originalText;
-        this.disabled = false;
-        isSubmitting = false;
-        addDebug('🔄 Estado do botão restaurado');
-      }
+    // ========== LINKTREE RIPPLE ==========
+    document.getElementById('linktreeBtn').addEventListener('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      ripple.style.background = 'rgba(255,255,255,0.2)';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
     });
 
-    // ============================================================
-    //  INICIALIZAÇÃO
-    // ============================================================
-    totalGenEl.textContent = totalGen;
-    addDebug(`📊 Total de gerações: ${totalGen}`);
+    // ========== INICIALIZAÇÃO ==========
+    // Mostrar uma frase motivacional ao carregar
+    setTimeout(() => {
+      showRandomMotivation();
+    }, 500);
 
-    setInterval(() => {
-      document.getElementById('onlineUsers').textContent = Math.floor(20 + Math.random() * 50);
-    }, 5000);
-
-    // Estilo confetti
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-      @keyframes fall {
-        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-        100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(styleSheet);
-
-    console.log('🚀 GERADOR DE SENSI carregado!');
-    addDebug('🚀 Sistema inicializado');
+    console.log('🚀 GERADOR DE SENSI - DOCKAZE carregado!');
+    console.log('📊 Total de gerações:', totalGen);
   </script>
 </body>
 </html>
