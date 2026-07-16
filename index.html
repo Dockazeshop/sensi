@@ -146,7 +146,9 @@
     .sensi-details .detail-item { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #ffffff11; }
     .sensi-details .detail-item .label { color: #aaa; }
     .sensi-details .detail-item .value { color: #ff4400; font-weight: 600; }
-    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #ff0033; animation: spin 0.8s linear infinite; margin-right: 10px; }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px; background: #ff003322; color: #ff4400; font-size: 0.8rem; margin-bottom: 0.5rem; }
   </style>
 </head>
 <body>
@@ -157,8 +159,9 @@
   <div id="toast">✨ Sensibilidade copiada!</div>
 
   <div class="container">
+    <!-- TÍTULO CORRIGIDO -->
     <div class="header-center" data-aos="fade-down">
-      <div class="neon-pulse">GERADOR DE LIKE</div>
+      <div class="neon-pulse">GERADOR DE SENSI</div>
     </div>
 
     <div class="card-sensi glass neon-border" data-aos="flip-up">
@@ -190,7 +193,9 @@
             <option value="2">★★</option>
             <option value="1">★</option>
           </select>
-          <button class="btn-primary" id="submitReviewBtn" style="padding:0.5rem 1.5rem;font-size:0.9rem;">Enviar</button>
+          <button class="btn-primary" id="submitReviewBtn" style="padding:0.5rem 1.5rem;font-size:0.9rem;margin-top:0;">
+            <i class="fas fa-paper-plane"></i> Enviar
+          </button>
         </div>
       </div>
       <div class="review-list" id="reviewList"></div>
@@ -221,7 +226,6 @@
       document.getElementById('scroll-progress').style.width = (scroll / height) * 100 + '%';
     });
 
-    // Cursor personalizado
     const cursor = document.getElementById('cursorGlow');
     document.addEventListener('mousemove', e => {
       cursor.style.left = e.clientX + 'px';
@@ -230,7 +234,6 @@
     document.addEventListener('mousedown', () => cursor.classList.add('active'));
     document.addEventListener('mouseup', () => cursor.classList.remove('active'));
 
-    // Partículas
     tsParticles.load('tsparticles', {
       particles: {
         number: { value: 60 },
@@ -258,17 +261,17 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // Autenticação anônima
     auth.signInAnonymously()
       .then(() => console.log('🔥 Firebase autenticado'))
       .catch(err => console.warn('Auth:', err));
 
-    // ========== VARIÁVEIS GLOBAIS ==========
+    // ========== VARIÁVEIS ==========
     let totalGen = parseInt(localStorage.getItem('totalGen')) || 0;
     let currentSensi = null;
     let reviewsCache = [];
+    let isSubmitting = false;
 
-    // ========== DOM ELEMENTS ==========
+    // ========== DOM ==========
     const dpiInput = document.getElementById('dpiInput');
     const generateBtn = document.getElementById('generateBtn');
     const resultsContainer = document.getElementById('resultsContainer');
@@ -282,64 +285,68 @@
     const toast = document.getElementById('toast');
 
     // ========== TOAST ==========
-    function showToast(msg) {
+    function showToast(msg, isError = false) {
       toast.textContent = msg;
+      toast.style.borderColor = isError ? '#ff0033' : '#ff4400';
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // ========== ALGORITMO IA - GERA 10 CONFIGURAÇÕES ==========
+    // ========== ALGORITMO - 10 CONFIGURAÇÕES (VALORES ATÉ 200) ==========
     function generateSensiConfigs(dpi) {
-      const base = Math.round(dpi / 5.5);
+      const base = Math.round(dpi / 4.2);
       const configs = [];
 
-      // 10 variações inteligentes baseadas no DPI
+      // 10 variações com valores que chegam até 200
       const variations = [
-        { geral: 22, redDot: 8, mira2x: -6, mira4x: -18, awm: -42, olhadinha: 32, botao: 45, cursor: 50, sensiGeral: 60, miraTele: 55 },
-        { geral: 18, redDot: 12, mira2x: -4, mira4x: -15, awm: -38, olhadinha: 28, botao: 50, cursor: 45, sensiGeral: 55, miraTele: 50 },
-        { geral: 25, redDot: 5, mira2x: -8, mira4x: -20, awm: -45, olhadinha: 35, botao: 40, cursor: 55, sensiGeral: 65, miraTele: 60 },
-        { geral: 20, redDot: 10, mira2x: -5, mira4x: -16, awm: -40, olhadinha: 30, botao: 48, cursor: 48, sensiGeral: 58, miraTele: 52 },
-        { geral: 28, redDot: 3, mira2x: -10, mira4x: -22, awm: -48, olhadinha: 38, botao: 42, cursor: 52, sensiGeral: 68, miraTele: 62 },
-        { geral: 15, redDot: 14, mira2x: -2, mira4x: -12, awm: -35, olhadinha: 25, botao: 55, cursor: 42, sensiGeral: 50, miraTele: 45 },
-        { geral: 30, redDot: 2, mira2x: -12, mira4x: -25, awm: -50, olhadinha: 40, botao: 38, cursor: 58, sensiGeral: 70, miraTele: 65 },
-        { geral: 17, redDot: 11, mira2x: -3, mira4x: -14, awm: -37, olhadinha: 27, botao: 52, cursor: 44, sensiGeral: 53, miraTele: 48 },
-        { geral: 23, redDot: 7, mira2x: -7, mira4x: -19, awm: -43, olhadinha: 33, botao: 46, cursor: 51, sensiGeral: 62, miraTele: 57 },
-        { geral: 26, redDot: 4, mira2x: -9, mira4x: -21, awm: -46, olhadinha: 36, botao: 43, cursor: 54, sensiGeral: 66, miraTele: 61 }
+        { g: 28, rd: 12, m2: -4, m4: -12, aw: -30, oh: 38, bt: 45, cs: 50, sg: 60, mt: 55 },
+        { g: 24, rd: 16, m2: -2, m4: -10, aw: -26, oh: 34, bt: 50, cs: 45, sg: 55, mt: 50 },
+        { g: 32, rd: 8, m2: -6, m4: -16, aw: -34, oh: 42, bt: 40, cs: 55, sg: 65, mt: 60 },
+        { g: 26, rd: 14, m2: -3, m4: -12, aw: -28, oh: 36, bt: 48, cs: 48, sg: 58, mt: 52 },
+        { g: 36, rd: 6, m2: -8, m4: -18, aw: -38, oh: 46, bt: 42, cs: 52, sg: 68, mt: 62 },
+        { g: 20, rd: 18, m2: 0, m4: -8, aw: -22, oh: 30, bt: 55, cs: 42, sg: 50, mt: 45 },
+        { g: 38, rd: 4, m2: -10, m4: -22, aw: -40, oh: 48, bt: 38, cs: 58, sg: 70, mt: 65 },
+        { g: 22, rd: 15, m2: -1, m4: -10, aw: -24, oh: 32, bt: 52, cs: 44, sg: 53, mt: 48 },
+        { g: 30, rd: 10, m2: -5, m4: -15, aw: -32, oh: 40, bt: 46, cs: 51, sg: 62, mt: 57 },
+        { g: 34, rd: 7, m2: -7, m4: -17, aw: -36, oh: 44, bt: 43, cs: 54, sg: 66, mt: 61 }
       ];
 
+      const factor = dpi / 400;
+
       variations.forEach((v, i) => {
-        const dpiFactor = dpi / 500;
         configs.push({
           id: i + 1,
-          geral: Math.min(200, Math.max(0, Math.round(base + v.geral))),
-          redDot: Math.min(200, Math.max(0, Math.round(base + v.redDot))),
-          mira2x: Math.min(200, Math.max(0, Math.round(base + v.mira2x))),
-          mira4x: Math.min(200, Math.max(0, Math.round(base + v.mira4x))),
-          awm: Math.min(200, Math.max(0, Math.round(base + v.awm))),
-          olhadinha: Math.min(200, Math.max(0, Math.round(base + v.olhadinha))),
-          tamanhoBotao: Math.min(100, Math.max(20, Math.round(v.botao * dpiFactor))),
-          velocidadeCursor: Math.min(100, Math.max(20, Math.round(v.cursor * dpiFactor))),
-          sensiGeral: Math.min(100, Math.max(20, Math.round(v.sensiGeral * dpiFactor))),
-          miraTele: Math.min(100, Math.max(20, Math.round(v.miraTele * dpiFactor)))
+          geral: Math.min(200, Math.max(0, Math.round(base + v.g))),
+          redDot: Math.min(200, Math.max(0, Math.round(base + v.rd))),
+          mira2x: Math.min(200, Math.max(0, Math.round(base + v.m2))),
+          mira4x: Math.min(200, Math.max(0, Math.round(base + v.m4))),
+          awm: Math.min(200, Math.max(0, Math.round(base + v.aw))),
+          olhadinha: Math.min(200, Math.max(0, Math.round(base + v.oh))),
+          tamanhoBotao: Math.min(100, Math.max(20, Math.round(v.bt * factor))),
+          velocidadeCursor: Math.min(100, Math.max(20, Math.round(v.cs * factor))),
+          sensiGeral: Math.min(100, Math.max(20, Math.round(v.sg * factor))),
+          miraTele: Math.min(100, Math.max(20, Math.round(v.mt * factor)))
         });
       });
 
       return configs;
     }
 
-    // ========== SORTEAR UMA CONFIGURAÇÃO ==========
+    // ========== SORTEAR 1 ==========
     function getRandomConfig(configs) {
-      const randomIndex = Math.floor(Math.random() * configs.length);
-      return configs[randomIndex];
+      return configs[Math.floor(Math.random() * configs.length)];
     }
 
-    // ========== RENDERIZAR RESULTADO ==========
+    // ========== RENDERIZAR ==========
     function renderResult(sensi) {
       currentSensi = sensi;
 
-      let html = `
-        <div style="margin-bottom: 0.5rem; color: #ff4400; font-size: 0.9rem;">
-          <i class="fas fa-dice"></i> Configuração ${sensi.id} de 10 sorteada!
+      const html = `
+        <div style="text-align: center; margin-bottom: 0.5rem;">
+          <span class="badge">
+            <i class="fas fa-dice"></i> Config ${sensi.id} de 10 sorteada!
+          </span>
         </div>
         <div class="results-grid">
           <div class="res-item"><div class="label">Geral</div><div class="value">${sensi.geral}</div></div>
@@ -353,7 +360,7 @@
           <div class="detail-item"><span class="label">Tamanho do Botão</span><span class="value">${sensi.tamanhoBotao}%</span></div>
           <div class="detail-item"><span class="label">Velocidade do Cursor</span><span class="value">${sensi.velocidadeCursor}%</span></div>
           <div class="detail-item"><span class="label">Sensibilidade Geral</span><span class="value">${sensi.sensiGeral}%</span></div>
-          <div class="detail-item"><span class="label">Sensibilidade Mira Tele</span><span class="value">${sensi.miraTele}%</span></div>
+          <div class="detail-item"><span class="label">Mira Telescópica</span><span class="value">${sensi.miraTele}%</span></div>
         </div>
       `;
 
@@ -361,9 +368,9 @@
       copyBtn.style.display = 'inline-block';
     }
 
-    // ========== GERAR SENSI ==========
+    // ========== GERAR ==========
     generateBtn.addEventListener('click', function(e) {
-      // Efeito ripple
+      // Ripple
       const rect = this.getBoundingClientRect();
       const ripple = document.createElement('span');
       ripple.className = 'ripple';
@@ -376,29 +383,28 @@
 
       const dpi = parseInt(dpiInput.value);
       if (isNaN(dpi) || dpi < 100 || dpi > 1000) {
-        showToast('⚠️ DPI inválido! Use valores entre 100 e 1000');
+        showToast('⚠️ DPI inválido! Use 100-1000', true);
         return;
       }
 
-      // Gerar 10 configurações e sortear 1
       const configs = generateSensiConfigs(dpi);
       const selected = getRandomConfig(configs);
       renderResult(selected);
 
-      // Atualizar estatísticas
       totalGen++;
       localStorage.setItem('totalGen', totalGen);
       totalGenEl.textContent = totalGen;
 
-      showToast('✅ Sensibilidade gerada com sucesso!');
+      showToast('✅ Sensibilidade gerada! Config ' + selected.id);
     });
 
     // ========== COPIAR ==========
     copyBtn.addEventListener('click', () => {
       if (!currentSensi) {
-        showToast('⚠️ Nenhuma sensibilidade para copiar');
+        showToast('⚠️ Nenhuma sensibilidade para copiar', true);
         return;
       }
+
       const txt = 
         `🎯 SENSI GERADA (Config ${currentSensi.id})\n` +
         `═══════════════════════════\n` +
@@ -416,7 +422,15 @@
 
       navigator.clipboard.writeText(txt)
         .then(() => showToast('📋 Sensibilidade copiada!'))
-        .catch(() => showToast('❌ Erro ao copiar'));
+        .catch(() => {
+          const ta = document.createElement('textarea');
+          ta.value = txt;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          showToast('📋 Sensibilidade copiada!');
+        });
     });
 
     // ========== FIREBASE REVIEWS ==========
@@ -433,15 +447,13 @@
 
         renderReviews();
         updateStats();
-        console.log('✅ Avaliações carregadas do Firebase:', reviewsCache.length);
+        console.log('✅ Avaliações carregadas:', reviewsCache.length);
       } catch (e) {
         console.warn('Erro ao carregar avaliações:', e);
-        // Fallback: dados locais
         const localReviews = JSON.parse(localStorage.getItem('reviews_fallback')) || [];
         reviewsCache = localReviews;
         renderReviews();
         updateStats();
-        showToast('⚠️ Usando avaliações salvas localmente');
       }
     }
 
@@ -454,22 +466,17 @@
       let html = '';
       reviewsCache.forEach(r => {
         const stars = '★'.repeat(Math.min(5, Math.max(0, r.stars || 0))) + '☆'.repeat(5 - Math.min(5, Math.max(0, r.stars || 0)));
-        const name = r.name || 'Anônimo';
-        const comment = r.comment || 'Sem comentário';
-        const date = r.date ? new Date(r.date).toLocaleString('pt-BR') : 'Data não informada';
-
         html += `
           <div class="review-item">
             <div>
-              <span class="name">${name}</span>
+              <span class="name">${r.name || 'Anônimo'}</span>
               <span class="stars">${stars}</span>
             </div>
-            <div style="margin: 4px 0;">${comment}</div>
-            <div class="date">${date}</div>
+            <div style="margin:4px 0;">${r.comment || 'Sem comentário'}</div>
+            <div class="date">${r.date ? new Date(r.date).toLocaleString('pt-BR') : ''}</div>
           </div>
         `;
       });
-
       reviewList.innerHTML = html;
     }
 
@@ -489,8 +496,12 @@
       avgDisplay.textContent = `★ ${avg.toFixed(1)} (${total} avaliações)`;
     }
 
-    // ========== ENVIAR AVALIAÇÃO ==========
+    // ========== ENVIAR AVALIAÇÃO - CORRIGIDO ==========
     submitReviewBtn.addEventListener('click', async function(e) {
+      // Evitar múltiplos envios
+      if (isSubmitting) return;
+      isSubmitting = true;
+
       // Ripple
       const rect = this.getBoundingClientRect();
       const ripple = document.createElement('span');
@@ -507,11 +518,12 @@
       const stars = parseInt(document.getElementById('reviewStars').value);
 
       if (stars < 1 || stars > 5) {
-        showToast('⚠️ Selecione uma nota válida');
+        showToast('⚠️ Selecione uma nota válida', true);
+        isSubmitting = false;
         return;
       }
 
-      // Mostrar loading no botão
+      // Salvar estado original do botão
       const originalText = this.innerHTML;
       this.innerHTML = '<span class="loading-spinner"></span> Enviando...';
       this.disabled = true;
@@ -529,7 +541,6 @@
         document.getElementById('reviewComment').value = '';
         document.getElementById('reviewName').value = '';
 
-        // Recarregar avaliações
         await loadReviews();
 
         // Confetti
@@ -567,11 +578,13 @@
           document.getElementById('reviewComment').value = '';
           document.getElementById('reviewName').value = '';
         } catch (fallbackError) {
-          showToast('❌ Erro ao salvar avaliação');
+          showToast('❌ Erro ao salvar avaliação', true);
         }
       } finally {
+        // Restaurar botão
         this.innerHTML = originalText;
         this.disabled = false;
+        isSubmitting = false;
       }
     });
 
@@ -579,7 +592,6 @@
     totalGenEl.textContent = totalGen;
     loadReviews();
 
-    // Simular usuários online
     setInterval(() => {
       document.getElementById('onlineUsers').textContent = Math.floor(20 + Math.random() * 50);
     }, 5000);
@@ -594,8 +606,7 @@
     `;
     document.head.appendChild(styleSheet);
 
-    console.log('🚀 GERADOR DE LIKE - DOCKAZE carregado!');
-    console.log('📊 Firebase:', firebaseConfig.projectId);
+    console.log('🚀 GERADOR DE SENSI - DOCKAZE carregado!');
   </script>
 </body>
 </html>
