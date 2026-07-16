@@ -2,652 +2,528 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>GERADOR DE SENSI · DOCKAZE</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0b0b0b;
-      font-family: 'Inter', sans-serif;
-      color: #fff;
-      cursor: none;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-      min-height: 100vh;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ferramentas de criação · Free Fire</title>
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase Modular SDK v10 (CDN) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js",
+        "firebase/storage": "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"
+      }
     }
-    .cursor-glow {
-      width: 20px; height: 20px;
-      background: radial-gradient(circle, #ff003388, transparent 70%);
-      border-radius: 50%;
-      position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      mix-blend-mode: screen;
-      transform: translate(-50%, -50%);
-      transition: width 0.15s, height 0.15s;
-    }
-    .cursor-glow.active { width: 50px; height: 50px; background: radial-gradient(circle, #ff444466, transparent 70%); }
-    #scroll-progress {
-      position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, #ff0033, #ff4400);
-      z-index: 9998; width: 0%; transition: width 0.1s;
-    }
-    #loader {
-      position: fixed; inset: 0; background: #0b0b0b; z-index: 10000;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.6s;
-    }
-    #loader.hidden { opacity: 0; pointer-events: none; }
-    .loader-ring {
-      width: 70px; height: 70px; border-radius: 50%; border: 6px solid transparent;
-      border-top: 6px solid #ff0033; border-right: 6px solid #ff4400;
-      animation: spin 1s linear infinite; box-shadow: 0 0 30px #ff003355;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .glass {
-      background: rgba(255,255,255,0.02);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,0,50,0.15);
-      border-radius: 28px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .neon-border { border: 1px solid #ff003366; box-shadow: 0 0 20px #ff003344, inset 0 0 20px #ff003311; }
-    .container { max-width: 700px; margin: 0 auto; padding: 1rem; }
-    .header-center { text-align: center; padding: 1rem 0 0.5rem; }
-    .neon-pulse {
-      font-size: 2.8rem;
-      font-weight: 800;
-      letter-spacing: 2px;
-      background: linear-gradient(135deg, #ff0033, #ff4400, #cc0033);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px #ff003388, 0 0 60px #ff440044;
-      animation: pulseGlow 3s infinite alternate;
-    }
-    @keyframes pulseGlow {
-      0% { text-shadow: 0 0 20px #ff003366, 0 0 40px #ff440033; }
-      100% { text-shadow: 0 0 40px #ff0033cc, 0 0 80px #ff440066; }
-    }
-    .card-sensi { max-width: 600px; margin: 0 auto; text-align: center; }
-    .card-sensi label { font-weight: 600; color: #ccc; display: block; margin-bottom: 0.5rem; }
-    .dpi-input {
-      width: 100%;
-      padding: 0.9rem;
-      border-radius: 60px;
-      border: 1px solid #ff003355;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      color: #fff;
-      font-size: 1.1rem;
-      text-align: center;
-      outline: none;
-      transition: 0.3s;
-    }
-    .dpi-input:focus { border-color: #ff4400; box-shadow: 0 0 30px #ff440044; }
-    .btn-primary {
-      margin-top: 1.5rem;
-      padding: 0.9rem 2.8rem;
-      border: none;
-      border-radius: 60px;
-      background: linear-gradient(135deg, #ff0033, #cc0022);
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.1rem;
-      box-shadow: 0 0 30px #ff003366;
-      transition: 0.3s;
-      position: relative;
-      overflow: hidden;
-      cursor: none;
-      width: 100%;
-      touch-action: manipulation;
-    }
-    .btn-primary:active { transform: scale(0.96); }
-    .btn-primary:hover { transform: scale(1.02); box-shadow: 0 0 50px #ff0033aa; }
-    .btn-primary .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); animation: rippleAnim 0.6s linear; }
-    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
-    .btn-primary .shine {
-      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.08), transparent);
-      transform: rotate(25deg); animation: shineMove 4s infinite;
-    }
-    @keyframes shineMove {
-      0% { transform: translateX(-100%) rotate(25deg); }
-      100% { transform: translateX(100%) rotate(25deg); }
-    }
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.8rem;
-      margin: 1.5rem 0;
-    }
-    .res-item {
-      background: rgba(255,255,255,0.02);
-      backdrop-filter: blur(6px);
-      padding: 0.7rem 0.4rem;
-      border-radius: 16px;
-      border: 1px solid #ff003344;
-      text-align: center;
-      transition: 0.3s;
-      box-shadow: 0 4px 20px #00000055;
-    }
-    .res-item:active { transform: scale(0.95); }
-    .res-item .label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-    .res-item .value { font-size: 1.8rem; font-weight: 700; color: #fff; text-shadow: 0 0 20px #ff003366; }
-    .copy-btn {
-      margin: 0.5rem 0 0;
-      padding: 0.6rem 2rem;
-      border: 1px solid #ff4400;
-      border-radius: 40px;
-      background: transparent;
-      color: #ff4400;
-      font-weight: 600;
-      transition: 0.3s;
-      cursor: none;
-      width: 100%;
-      touch-action: manipulation;
-    }
-    .copy-btn:active { transform: scale(0.95); }
-    .copy-btn:hover { background: #ff440022; box-shadow: 0 0 30px #ff440044; }
-    .sensi-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin: 1rem 0;
-      text-align: left;
-    }
-    .sensi-details .detail-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.3rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .sensi-details .detail-item .label { color: #aaa; font-size: 0.8rem; }
-    .sensi-details .detail-item .value { color: #ff4400; font-weight: 600; font-size: 0.9rem; }
-
-    /* CARDS DE MOTIVAÇÃO + DICA */
-    .motivation-card {
-      margin-top: 1.2rem;
-      padding: 1rem 1.2rem;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(255,68,0,0.08), rgba(255,0,51,0.05));
-      border: 1px solid rgba(255,68,0,0.2);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.6s ease;
-      min-height: 80px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .motivation-card.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .motivation-card .frase {
-      font-size: 1.1rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ff4400, #ff0033);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px #ff003366;
-      margin-bottom: 0.5rem;
-    }
-    .motivation-card .frase i {
-      -webkit-text-fill-color: initial;
-      color: #ffd700;
-      margin-right: 8px;
-    }
-    .motivation-card .dica {
-      font-size: 0.85rem;
-      color: #aaa;
-      line-height: 1.4;
-      padding-left: 4px;
-    }
-    .motivation-card .dica i {
-      color: #ff4400;
-      margin-right: 6px;
-      -webkit-text-fill-color: #ff4400;
-    }
-
-    /* LINKTREE BUTTON */
-    .linktree-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 0.9rem 1.5rem;
-      border-radius: 60px;
-      background: linear-gradient(135deg, #00cc66, #00994d);
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.1rem;
-      text-decoration: none;
-      transition: 0.3s;
-      box-shadow: 0 0 40px rgba(0,204,102,0.3);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(0,204,102,0.3);
-      width: 100%;
-      touch-action: manipulation;
-      position: relative;
-      overflow: hidden;
-    }
-    .linktree-btn:active { transform: scale(0.96); }
-    .linktree-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 60px rgba(0,204,102,0.5);
-    }
-    .linktree-btn i { font-size: 1.5rem; color: #fff; }
-    .linktree-btn .linktree-icon {
-      width: 32px;
-      height: 32px;
-      background: #fff;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      color: #00994d;
-      font-size: 0.8rem;
-    }
-    .linktree-btn .blur-effect {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba(0,204,102,0.15), transparent 70%);
-      border-radius: 60px;
-      filter: blur(20px);
-      pointer-events: none;
-    }
-    .linktree-wrapper {
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* REDES SOCIAIS */
-    .social-icons {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 1.5rem 0 0.5rem;
-    }
-    .social-icons a {
-      color: #888;
-      font-size: 2rem;
-      transition: 0.3s;
-      text-decoration: none;
-      touch-action: manipulation;
-    }
-    .social-icons a:active { transform: scale(0.85); }
-    .social-icons a:hover {
-      color: #ff0033;
-      transform: translateY(-3px);
-      text-shadow: 0 0 30px #ff003366;
-    }
-    .social-icons .instagram:hover { color: #E4405F; text-shadow: 0 0 30px #E4405F66; }
-    .social-icons .youtube:hover { color: #FF0000; text-shadow: 0 0 30px #FF000066; }
-
-    footer {
-      text-align: center;
-      padding: 1.5rem 0 1rem;
-      border-top: 1px solid rgba(255,0,51,0.2);
-      margin-top: 1rem;
-    }
-    .dockaze {
-      font-weight: 800;
-      font-size: 1.4rem;
-      background: linear-gradient(135deg, #ff0033, #ff4400, #cc0033);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px #ff003388;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .verified-icon { color: #ff0033; font-size: 1rem; -webkit-text-fill-color: #ff0033; }
-    #toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1a1a1a;
-      backdrop-filter: blur(12px);
-      padding: 0.8rem 2rem;
-      border-radius: 60px;
-      border: 1px solid #ff0033;
-      box-shadow: 0 0 40px #ff003344;
-      font-weight: 600;
-      opacity: 0;
-      transition: 0.4s;
-      z-index: 999;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-    #toast.show { opacity: 1; bottom: 50px; }
-    #tsparticles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #0b0b0b; }
-    ::-webkit-scrollbar-thumb { background: #ff0033; border-radius: 10px; }
-
-    @media (max-width: 640px) {
-      .neon-pulse { font-size: 2rem; }
-      .results-grid { grid-template-columns: repeat(2, 1fr); }
-      .sensi-details { grid-template-columns: 1fr; }
-      #toast { white-space: normal; max-width: 90%; font-size: 0.8rem; }
-      .social-icons a { font-size: 1.8rem; gap: 1.5rem; }
-      .motivation-card .frase { font-size: 0.95rem; }
-      .motivation-card .dica { font-size: 0.8rem; }
-    }
-  </style>
+  </script>
 </head>
-<body>
-  <div id="loader"><div class="loader-ring"></div><p style="margin-top:1rem;color:#888;">Carregando...</p></div>
-  <div id="scroll-progress"></div>
-  <div class="cursor-glow" id="cursorGlow"></div>
-  <div id="tsparticles"></div>
-  <div id="toast">✨ Sensibilidade copiada!</div>
+<body class="bg-[#0b0b0b] text-gray-100 font-sans antialiased">
 
-  <div class="container">
-    <!-- TOPO -->
-    <div class="header-center" data-aos="fade-down">
-      <div class="neon-pulse">GERADOR DE SENSI</div>
-    </div>
-
-    <!-- CARD PRINCIPAL -->
-    <div class="glass neon-border card-sensi" data-aos="flip-up">
-      <label><i class="fas fa-mouse-pointer" style="color:#ff0033;"></i> Digite seu DPI</label>
-      <input type="number" id="dpiInput" class="dpi-input" placeholder="100 – 1000" min="100" max="1000" value="400">
-      <button class="btn-primary" id="generateBtn">
-        <span class="shine"></span>
-        <i class="fas fa-random"></i> GERAR SENSIBILIDADE
-      </button>
-      <div id="resultsContainer" style="margin-top:1.5rem;"></div>
-      <button class="copy-btn" id="copySensiBtn" style="display:none;">
-        <i class="fas fa-copy"></i> COPIAR SENSI
-      </button>
-
-      <!-- CARD DE MOTIVAÇÃO + DICA -->
-      <div id="motivationCard" class="motivation-card">
-        <div class="frase" id="fraseDisplay">
-          <i class="fas fa-fire"></i> TREINE POIS A SENSI NÃO FAZ MILAGRE
-        </div>
-        <div class="dica" id="dicaDisplay">
-          <i class="fas fa-lightbulb"></i> Treine 20 a 40 minutos por dia no modo treino para criar memória muscular
-        </div>
+  <!-- ====== HEADER / HERO ====== -->
+  <header class="relative bg-gradient-to-r from-[#1a0505] via-[#2a0a0a] to-[#1a0505] border-b border-red-700/40 shadow-xl shadow-red-900/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl font-black text-white tracking-tight drop-shadow-md">🔥 <span class="text-red-500">Ferramentas</span> de criação</span>
       </div>
+      <nav class="flex items-center gap-4 text-sm font-medium">
+        <a href="#" class="text-gray-300 hover:text-red-400 transition-colors duration-200">Recursos</a>
+        <a href="#" class="text-gray-300 hover:text-red-400 transition-colors duration-200">Hashtags</a>
+        <span id="adminIndicator" class="text-red-500 text-xs hidden">● ADM</span>
+        <a id="ardmLink" href="#" class="text-[10px] text-gray-700 hover:text-red-400 transition-colors duration-200 opacity-60 hover:opacity-100 ml-2">ARDM</a>
+      </nav>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 pb-6">
+      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight drop-shadow-lg">
+        <span class="text-red-500">Domine</span> o conteúdo <br class="sm:hidden">
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-red-600">Free Fire</span>
+      </h1>
+      <p class="text-gray-400 text-sm mt-1 max-w-xl">Áudios, vídeos, imagens, arquivos e gerador de hashtags — tudo em um só lugar.</p>
+    </div>
+  </header>
+
+  <!-- ====== CONTEÚDO PRINCIPAL ====== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ====== ABAS ====== -->
+    <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-3 mb-8">
+      <button data-tab="audios" class="tab-btn px-6 py-2 rounded-full bg-red-600/20 text-red-400 font-semibold border border-red-600/30 hover:bg-red-600/40 transition-all duration-200">🎧 Áudios</button>
+      <button data-tab="videos" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200">🎬 Vídeos</button>
+      <button data-tab="imagens" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200">🖼️ Imagens</button>
+      <button data-tab="arquivos" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200">📁 Arquivos</button>
+      <button data-tab="hashtags" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200"># Hashtags</button>
     </div>
 
-    <!-- LINKTREE -->
-    <div class="glass neon-border linktree-wrapper" data-aos="fade-up">
-      <a href="https://linktr.ee/DOCKAZE" target="_blank" class="linktree-btn" id="linktreeBtn">
-        <div class="blur-effect"></div>
-        <div class="linktree-icon">LT</div>
-        <span>Acesse nosso Linktree</span>
-        <i class="fas fa-arrow-right"></i>
-      </a>
+    <!-- ====== CONTAINER DAS ABAS ====== -->
+    <div id="tabContent" class="min-h-[400px]">
+      <!-- conteúdo renderizado via js -->
     </div>
 
-    <!-- RODAPÉ COM REDES SOCIAIS -->
-    <footer>
-      <div class="social-icons">
-        <a href="https://www.instagram.com/dockaze_ff?igsh=dzh3YWhwcHZwcmFp" target="_blank" class="instagram" aria-label="Instagram">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://youtube.com/@dockaze?si=ASOn8YnUf3zSOH-3" target="_blank" class="youtube" aria-label="YouTube">
-          <i class="fab fa-youtube"></i>
-        </a>
+    <!-- ====== RODAPÉ ====== -->
+    <footer class="mt-20 border-t border-gray-800/60 pt-6 pb-4 text-xs text-gray-500 flex flex-wrap justify-between items-center">
+      <div class="flex items-center gap-4">
+        <a href="https://www.instagram.com/dockaze_ff?igsh=dzh3YWhwcHZwcmFp" target="_blank" class="text-gray-400 hover:text-red-400 transition-colors">📸 Instagram</a>
+        <a href="https://youtube.com/@dockaze?si=oq47qXhKmZBhEKFV" target="_blank" class="text-gray-400 hover:text-red-400 transition-colors">▶️ YouTube</a>
+        <span>© 2025 DOCKAZE</span>
       </div>
-
-      <div style="height:1px;width:60%;margin:1rem auto;background:linear-gradient(90deg,transparent,#ff0033,transparent);"></div>
-      <p style="color:#666;font-size:0.8rem;">© 2026 Todos os direitos reservados.</p>
-      <div style="margin-top:0.3rem;">
-        <span style="color:#666;font-size:0.8rem;">Desenvolvido por </span>
-        <span class="dockaze">DOCKAZE <i class="fas fa-check-circle verified-icon"></i></span>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600">desenvolvido por</span>
+        <span class="text-gray-300 font-medium">DOCKAZE</span>
+        <span id="ardmFooter" class="text-[9px] text-gray-700 hover:text-red-400 cursor-pointer ml-1 opacity-40 hover:opacity-100 transition-opacity">ARDM</span>
       </div>
     </footer>
+  </main>
+
+  <!-- ====== MODAL DE LOGIN ARDM ====== -->
+  <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-opacity duration-300">
+    <div class="bg-[#1a1a1a] border border-red-700/40 rounded-2xl p-8 max-w-sm w-full shadow-2xl shadow-red-900/30">
+      <h2 class="text-2xl font-bold text-white mb-1">🔐 Acesso ARDM</h2>
+      <p class="text-gray-400 text-sm mb-6">Painel de controle para DOCKAZE</p>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300">Usuário</label>
+          <input type="text" id="loginUser" value="DOCKAZE" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-600 focus:border-transparent outline-none" readonly>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300">Senha</label>
+          <input type="password" id="loginPass" placeholder="••••••••" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-red-600 focus:border-transparent outline-none">
+        </div>
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 transition-colors py-2.5 rounded-lg font-bold text-white shadow-lg shadow-red-900/30">Entrar</button>
+        <p id="loginError" class="text-red-400 text-xs text-center h-5"></p>
+      </form>
+      <button id="closeLoginModal" class="absolute top-3 right-4 text-gray-500 hover:text-gray-300 text-xl">✕</button>
+    </div>
   </div>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    // ========== INICIALIZAÇÕES ==========
-    AOS.init({ duration: 600, once: false, mirror: true });
+  <!-- ====== MODAL DE VISUALIZAÇÃO (IMAGENS LIGHTBOX) ====== -->
+  <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-opacity duration-300">
+    <div class="relative max-w-4xl max-h-[90vh] p-4">
+      <img id="lightboxImg" src="" alt="preview" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-red-900/30 object-contain">
+      <button id="closeLightbox" class="absolute top-2 right-2 text-white bg-black/60 rounded-full p-2 hover:bg-red-600/80 transition">✕</button>
+    </div>
+  </div>
 
-    window.addEventListener('load', () => {
-      document.getElementById('loader').classList.add('hidden');
-    });
+  <!-- ====== DASHBOARD ARDM (PAINEL ADMIN) ====== -->
+  <div id="adminDashboard" class="hidden fixed inset-0 z-40 bg-[#0a0a0a] overflow-y-auto pt-20 pb-10 px-4">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex justify-between items-center border-b border-red-800/50 pb-4 mb-6">
+        <h2 class="text-3xl font-black text-white">⚙️ Painel ARDM <span class="text-red-500 text-sm font-normal">(DOCKAZE)</span></h2>
+        <button id="logoutBtn" class="bg-red-700 hover:bg-red-800 px-5 py-2 rounded-lg font-bold text-sm transition-colors">Sair</button>
+      </div>
 
-    window.addEventListener('scroll', () => {
-      let scroll = document.documentElement.scrollTop || document.body.scrollTop;
-      let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      document.getElementById('scroll-progress').style.width = (scroll / height) * 100 + '%';
-    });
+      <!-- Formulário de Upload -->
+      <div class="bg-[#151515] border border-red-900/30 rounded-2xl p-6 mb-10">
+        <h3 class="text-xl font-semibold text-white mb-4">📤 Adicionar recurso</h3>
+        <form id="uploadForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-sm text-gray-300">Título *</label>
+            <input type="text" id="uploadTitle" required placeholder="Ex: Fala do Chrono" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300">Categoria *</label>
+            <select id="uploadCategory" required class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+              <option value="audio">Áudio</option>
+              <option value="video">Vídeo</option>
+              <option value="imagem">Imagem</option>
+              <option value="arquivo">Arquivo</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300">URL da Thumbnail *</label>
+            <input type="url" id="uploadThumbnail" required placeholder="https://exemplo.com/imagem.jpg" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm text-gray-300">URL de Download *</label>
+            <input type="url" id="uploadDownloadUrl" required placeholder="https://exemplo.com/arquivo.zip" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+          </div>
+          <div class="md:col-span-2">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 transition-colors px-6 py-2 rounded-lg font-bold text-white shadow-lg shadow-red-900/30">Adicionar recurso</button>
+          </div>
+        </form>
+        <div id="uploadStatus" class="text-sm text-gray-400 mt-3"></div>
+      </div>
 
-    const cursor = document.getElementById('cursorGlow');
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-    });
-    document.addEventListener('mousedown', () => cursor.classList.add('active'));
-    document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+      <!-- Tabela de gerenciamento -->
+      <div>
+        <h3 class="text-xl font-semibold text-white mb-4">📋 Recursos cadastrados</h3>
+        <div id="adminTableContainer" class="bg-[#151515] border border-red-900/30 rounded-2xl overflow-x-auto p-2">
+          <table class="w-full text-sm text-left text-gray-300">
+            <thead class="text-xs uppercase bg-black/40 text-gray-400 border-b border-red-900/30">
+              <tr><th class="px-4 py-3">Título</th><th class="px-4 py-3">Categoria</th><th class="px-4 py-3">Ações</th></tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <!-- preenchido via js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // ========== PARTÍCULAS ==========
-    tsParticles.load('tsparticles', {
-      particles: {
-        number: { value: 50 },
-        color: { value: ['#ff0033', '#ff4400', '#cc0033'] },
-        opacity: { value: 0.25 },
-        size: { value: 2 },
-        move: { speed: 0.4, direction: 'none', random: true, straight: false },
-        links: { enable: true, color: '#ff0033', opacity: 0.1 }
-      },
-      interactivity: { events: { onHover: { enable: true, mode: 'repulse' } } }
-    });
+  <!-- ====== SCRIPTS ====== -->
+  <script type="module">
+    // ====== IMPORTS FIREBASE ======
+    import { initializeApp } from 'firebase/app';
+    import { getAuth } from 'firebase/auth';
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+    import { getStorage } from 'firebase/storage';
 
-    // ========== FRASES MOTIVACIONAIS ==========
-    const frases = [
-      { frase: '🔥 TREINE POIS A SENSI NÃO FAZ MILAGRE', dica: 'Treine 20 a 40 minutos por dia no modo treino para criar memória muscular [citation:3]' },
-      { frase: '💪 A SENSI É O MAPA, O TREINO É A CAMINHADA', dica: 'Cada partida é um reto, e você nasceu para enfrentá-los [citation:2]' },
-      { frase: '🎯 NÃO ADIANTA TER A MELHOR SENSI SEM TREINO', dica: 'Disparar em pequenas rajadas melhora a estabilidade e permite corrigir o recuo [citation:1]' },
-      { frase: '🚀 SENSI BOA + TREINO = RANK UP', dica: 'Ajuste a sensibilidade aos poucos, nunca tudo de uma vez. Cada celular responde diferente [citation:3]' },
-      { frase: '🏆 CONFIE NA SENSI, MAS CONFIE MAIS NO SEU TREINO', dica: 'Puxe levemente a mira para baixo ao atirar para compensar o recuo natural das armas [citation:6]' },
-      { frase: '⚡ A SENSI AJUDA, MAS O TREINO TE FAZ CAMPEÃO', dica: 'Treine com diferentes armas no campo de treinamento para entender o recuo de cada uma [citation:4]' },
-      { frase: '🔥 VOCÊ É O DESIGNER DO SEU PRÓPRIO DESTINO', dica: 'Ajuste HUD, botões e sensibilidade conforme seu estilo de jogo [citation:11]' },
-      { frase: '🎯 MIS MOVIMENTOS NÃO SE PREDIZEM, SE TEMEM', dica: 'Pratique movimentação e posicionamento: saber se proteger é tão importante quanto atirar bem [citation:10]' },
-      { frase: '💀 O MAIOR DESESPERO DOS INIMIGOS É SUA VITÓRIA', dica: 'Grave suas partidas, detecte erros e mantenha rotinas constantes de prática [citation:1]' },
-      { frase: '🏆 APRENDA COM CADA DERROTA, ELA É SUA ARMA SECRETA', dica: 'Analise suas mortes e observe os padrões dos adversários [citation:10]' }
-    ];
+    // ====== CONFIG FIREBASE (NOVAS CREDENCIAIS) ======
+    const firebaseConfig = {
+      apiKey: "AIzaSyCykvFRXrglqPTZtZ2YukRXtkHwDQvNJO0",
+      authDomain: "ferramentas-de-criacao.firebaseapp.com",
+      databaseURL: "https://ferramentas-de-criacao-default-rtdb.firebaseio.com",
+      projectId: "ferramentas-de-criacao",
+      storageBucket: "ferramentas-de-criacao.firebasestorage.app",
+      messagingSenderId: "812212455743",
+      appId: "1:812212455743:web:0258f77de3ba90b173eb8a"
+    };
 
-    // ========== VARIÁVEIS ==========
-    let totalGen = parseInt(localStorage.getItem('totalGen')) || 0;
-    let currentSensi = null;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    // ========== DOM ==========
-    const dpiInput = document.getElementById('dpiInput');
-    const generateBtn = document.getElementById('generateBtn');
-    const resultsContainer = document.getElementById('resultsContainer');
-    const copyBtn = document.getElementById('copySensiBtn');
-    const toast = document.getElementById('toast');
-    const motivationCard = document.getElementById('motivationCard');
-    const fraseDisplay = document.getElementById('fraseDisplay');
-    const dicaDisplay = document.getElementById('dicaDisplay');
+    // ====== REFERÊNCIAS DOM ======
+    const tabContent = document.getElementById('tabContent');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const loginModal = document.getElementById('loginModal');
+    const adminDashboard = document.getElementById('adminDashboard');
+    const adminIndicator = document.getElementById('adminIndicator');
+    const ardmLink = document.getElementById('ardmLink');
+    const ardmFooter = document.getElementById('ardmFooter');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const adminTableBody = document.getElementById('adminTableBody');
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const closeLightbox = document.getElementById('closeLightbox');
 
-    // ========== TOAST ==========
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toast._timeout);
-      toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
-    }
+    // ====== ESTADO ======
+    let currentUser = null;
+    let allResources = [];
+    let currentTab = 'audios';
 
-    // ========== ALGORITMO - 10 CONFIGURAÇÕES ==========
-    function generateSensiConfigs(dpi) {
-      const base = Math.round(dpi / 4.2);
-      const configs = [];
+    // ====== CREDENCIAIS DIRETAS ======
+    const VALID_USER = "DOCKAZE";
+    const VALID_PASSWORD = "ardm2025";
 
-      const variations = [
-        { g: 28, rd: 12, m2: -4, m4: -12, aw: -30, oh: 38, bt: 45, cs: 50, sg: 60, mt: 55 },
-        { g: 24, rd: 16, m2: -2, m4: -10, aw: -26, oh: 34, bt: 50, cs: 45, sg: 55, mt: 50 },
-        { g: 32, rd: 8, m2: -6, m4: -16, aw: -34, oh: 42, bt: 40, cs: 55, sg: 65, mt: 60 },
-        { g: 26, rd: 14, m2: -3, m4: -12, aw: -28, oh: 36, bt: 48, cs: 48, sg: 58, mt: 52 },
-        { g: 36, rd: 6, m2: -8, m4: -18, aw: -38, oh: 46, bt: 42, cs: 52, sg: 68, mt: 62 },
-        { g: 20, rd: 18, m2: 0, m4: -8, aw: -22, oh: 30, bt: 55, cs: 42, sg: 50, mt: 45 },
-        { g: 38, rd: 4, m2: -10, m4: -22, aw: -40, oh: 48, bt: 38, cs: 58, sg: 70, mt: 65 },
-        { g: 22, rd: 15, m2: -1, m4: -10, aw: -24, oh: 32, bt: 52, cs: 44, sg: 53, mt: 48 },
-        { g: 30, rd: 10, m2: -5, m4: -15, aw: -32, oh: 40, bt: 46, cs: 51, sg: 62, mt: 57 },
-        { g: 34, rd: 7, m2: -7, m4: -17, aw: -36, oh: 44, bt: 43, cs: 54, sg: 66, mt: 61 }
-      ];
-
-      const factor = dpi / 400;
-
-      variations.forEach((v, i) => {
-        configs.push({
-          id: i + 1,
-          geral: Math.min(200, Math.max(0, Math.round(base + v.g))),
-          redDot: Math.min(200, Math.max(0, Math.round(base + v.rd))),
-          mira2x: Math.min(200, Math.max(0, Math.round(base + v.m2))),
-          mira4x: Math.min(200, Math.max(0, Math.round(base + v.m4))),
-          awm: Math.min(200, Math.max(0, Math.round(base + v.aw))),
-          olhadinha: Math.min(200, Math.max(0, Math.round(base + v.oh))),
-          tamanhoBotao: Math.min(100, Math.max(20, Math.round(v.bt * factor))),
-          velocidadeCursor: Math.min(100, Math.max(20, Math.round(v.cs * factor))),
-          sensiGeral: Math.min(100, Math.max(20, Math.round(v.sg * factor))),
-          miraTele: Math.min(100, Math.max(20, Math.round(v.mt * factor)))
-        });
+    // ====== RENDERIZAÇÃO DE ABAS ======
+    function renderTab(tabName) {
+      currentTab = tabName;
+      tabBtns.forEach(btn => {
+        const isActive = btn.dataset.tab === tabName;
+        btn.classList.toggle('bg-red-600/20', isActive);
+        btn.classList.toggle('text-red-400', isActive);
+        btn.classList.toggle('border-red-600/30', isActive);
+        btn.classList.toggle('bg-gray-800/60', !isActive);
+        btn.classList.toggle('text-gray-300', !isActive);
+        btn.classList.toggle('border-transparent', !isActive);
       });
 
-      return configs;
-    }
-
-    function getRandomConfig(configs) {
-      return configs[Math.floor(Math.random() * configs.length)];
-    }
-
-    function renderResult(sensi) {
-      currentSensi = sensi;
-
-      const html = `
-        <div class="results-grid">
-          <div class="res-item"><div class="label">Geral</div><div class="value">${sensi.geral}</div></div>
-          <div class="res-item"><div class="label">Red Dot</div><div class="value">${sensi.redDot}</div></div>
-          <div class="res-item"><div class="label">2x</div><div class="value">${sensi.mira2x}</div></div>
-          <div class="res-item"><div class="label">4x</div><div class="value">${sensi.mira4x}</div></div>
-          <div class="res-item"><div class="label">AWM</div><div class="value">${sensi.awm}</div></div>
-          <div class="res-item"><div class="label">Olhadinha</div><div class="value">${sensi.olhadinha}</div></div>
-        </div>
-        <div class="sensi-details">
-          <div class="detail-item"><span class="label">Tamanho do Botão</span><span class="value">${sensi.tamanhoBotao}%</span></div>
-          <div class="detail-item"><span class="label">Velocidade do Cursor</span><span class="value">${sensi.velocidadeCursor}%</span></div>
-          <div class="detail-item"><span class="label">Sensibilidade Geral</span><span class="value">${sensi.sensiGeral}%</span></div>
-          <div class="detail-item"><span class="label">Mira Telescópica</span><span class="value">${sensi.miraTele}%</span></div>
-        </div>
-      `;
-
-      resultsContainer.innerHTML = html;
-      copyBtn.style.display = 'inline-block';
-    }
-
-    // ========== MOSTRAR FRASE + DICA ALEATÓRIA ==========
-    function showRandomMotivation() {
-      const random = frases[Math.floor(Math.random() * frases.length)];
-      fraseDisplay.innerHTML = random.frase;
-      dicaDisplay.innerHTML = `<i class="fas fa-lightbulb"></i> ${random.dica}`;
-      motivationCard.classList.add('show');
-    }
-
-    // ========== GERAR ==========
-    generateBtn.addEventListener('click', function(e) {
-      // Ripple
-      const rect = this.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple';
-      const size = Math.max(rect.width, rect.height);
-      ripple.style.width = ripple.style.height = size + 'px';
-      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-      this.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
-
-      const dpi = parseInt(dpiInput.value);
-      if (isNaN(dpi) || dpi < 100 || dpi > 1000) {
-        showToast('⚠️ DPI inválido! Use 100-1000');
+      if (tabName === 'hashtags') {
+        renderHashtags();
         return;
       }
 
-      const configs = generateSensiConfigs(dpi);
-      const selected = getRandomConfig(configs);
-      renderResult(selected);
-
-      totalGen++;
-      localStorage.setItem('totalGen', totalGen);
-
-      // Mostrar frase + dica aleatória
-      showRandomMotivation();
-
-      showToast('✅ Sensibilidade gerada!');
-    });
-
-    // ========== COPIAR ==========
-    copyBtn.addEventListener('click', () => {
-      if (!currentSensi) {
-        showToast('⚠️ Nenhuma sensibilidade para copiar');
+      const filtered = allResources.filter(r => r.categoria === tabName);
+      if (filtered.length === 0) {
+        tabContent.innerHTML = `<div class="text-gray-500 text-center py-16 text-lg">Nenhum recurso disponível em <span class="text-red-400">${tabName}</span></div>`;
         return;
       }
 
-      const txt =
-        `🎯 SENSI GERADA\n` +
-        `═══════════════════════════\n` +
-        `Geral: ${currentSensi.geral}\n` +
-        `Red Dot: ${currentSensi.redDot}\n` +
-        `2x: ${currentSensi.mira2x}\n` +
-        `4x: ${currentSensi.mira4x}\n` +
-        `AWM: ${currentSensi.awm}\n` +
-        `Olhadinha: ${currentSensi.olhadinha}\n` +
-        `\n📊 CONFIGURAÇÕES EXTRAS:\n` +
-        `Tamanho do Botão: ${currentSensi.tamanhoBotao}%\n` +
-        `Velocidade do Cursor: ${currentSensi.velocidadeCursor}%\n` +
-        `Sensibilidade Geral: ${currentSensi.sensiGeral}%\n` +
-        `Mira Telescópica: ${currentSensi.miraTele}%`;
+      let html = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">`;
+      filtered.forEach(item => {
+        const isImage = item.categoria === 'imagem';
+        const isAudio = item.categoria === 'audio';
+        const isVideo = item.categoria === 'video';
+        const isFile = item.categoria === 'arquivo';
 
-      navigator.clipboard.writeText(txt)
-        .then(() => showToast('📋 Sensibilidade copiada!'))
-        .catch(() => {
-          const ta = document.createElement('textarea');
-          ta.value = txt;
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          ta.remove();
-          showToast('📋 Sensibilidade copiada!');
+        let card = `<div class="bg-[#141414] border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-1">`;
+        
+        // Thumbnail
+        if (isImage) {
+          card += `<div class="h-48 bg-black/60 relative group cursor-pointer" onclick="window.lightboxPreview('${item.thumbnail}')">
+            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition"></div>
+          </div>`;
+        } else if (isVideo) {
+          card += `<div class="h-48 bg-black/60 relative overflow-hidden">
+            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover transition duration-300 hover:scale-105">
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span class="text-4xl">▶️</span>
+            </div>
+          </div>`;
+        } else if (isAudio) {
+          card += `<div class="h-32 bg-black/60 relative overflow-hidden">
+            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span class="text-4xl">🎵</span>
+            </div>
+          </div>
+          <div class="bg-black/40 flex items-center px-3 py-2">
+            <audio controls class="w-full h-8" src="${item.downloadUrl}"></audio>
+          </div>`;
+        } else {
+          card += `<div class="h-32 bg-black/60 relative overflow-hidden">
+            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span class="text-4xl">📄</span>
+            </div>
+          </div>`;
+        }
+
+        card += `<div class="p-4 flex justify-between items-center">
+          <span class="font-semibold text-white truncate">${item.titulo}</span>
+          <a href="${item.downloadUrl}" target="_blank" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-3 py-1 rounded-full text-xs font-bold transition">Download</a>
+        </div>`;
+        card += `</div>`;
+        html += card;
+      });
+      html += `</div>`;
+      tabContent.innerHTML = html;
+    }
+
+    // ====== HASHTAGS ======
+    function renderHashtags() {
+      const tags = {
+        'Clips': ['#FreeFireClips', '#FFClips', '#FreeFireHighlights', '#MelhoresMomentos'],
+        'Dicas': ['#DicasFreeFire', '#FreeFireTips', '#FFDicas', '#FreeFireStrategy'],
+        'Engajamento': ['#FreeFireBrasil', '#FFCommunity', '#FreeFireLovers', '#FFArmy'],
+        'Campeonato': ['#FreeFireChampionship', '#FFTournament', '#FreeFirePro', '#FFEsports']
+      };
+      let html = `<div class="bg-[#141414] border border-gray-800 rounded-2xl p-6">
+        <h3 class="text-2xl font-bold text-white mb-4"># Gerador de Hashtags</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
+      for (const [cat, list] of Object.entries(tags)) {
+        html += `<div class="bg-black/30 rounded-xl p-4 border border-gray-700/50">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-red-400 font-bold">${cat}</span>
+            <button onclick="window.copyTags('${list.join(',')}')" class="text-xs bg-gray-700 hover:bg-red-600 px-3 py-1 rounded-full transition">Copiar</button>
+          </div>
+          <div class="flex flex-wrap gap-2">`;
+        list.forEach(t => {
+          html += `<span class="tag-item bg-gray-800/60 hover:bg-red-600/30 px-3 py-1 rounded-full text-xs cursor-pointer transition" onclick="window.selectTag('${t}')">${t}</span>`;
         });
+        html += `</div></div>`;
+      }
+      html += `</div>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <span class="text-gray-400 text-sm">Tags selecionadas:</span>
+          <span id="selectedTagsDisplay" class="text-white bg-black/40 px-3 py-1 rounded-full text-sm border border-gray-600 min-w-[100px]"></span>
+          <button onclick="window.copySelectedTags()" class="bg-red-600 hover:bg-red-700 px-4 py-1.5 rounded-full text-sm font-bold transition">Copiar selecionadas</button>
+          <button onclick="window.clearSelectedTags()" class="text-gray-400 hover:text-red-400 text-sm transition">Limpar</button>
+        </div>
+      </div>`;
+      tabContent.innerHTML = html;
+      window.selectedTags = [];
+      document.getElementById('selectedTagsDisplay').textContent = 'nenhuma';
+    }
+
+    // ====== FUNÇÕES GLOBAIS PARA HASHTAGS ======
+    window.copyTags = (str) => {
+      navigator.clipboard.writeText(str).then(() => alert('Hashtags copiadas!')).catch(() => {});
+    };
+    window.selectTag = (tag) => {
+      if (!window.selectedTags) window.selectedTags = [];
+      if (!window.selectedTags.includes(tag)) {
+        window.selectedTags.push(tag);
+        document.getElementById('selectedTagsDisplay').textContent = window.selectedTags.join(' ');
+      }
+    };
+    window.copySelectedTags = () => {
+      if (!window.selectedTags || window.selectedTags.length === 0) return alert('Nenhuma tag selecionada');
+      navigator.clipboard.writeText(window.selectedTags.join(' ')).then(() => alert('Tags copiadas!')).catch(() => {});
+    };
+    window.clearSelectedTags = () => {
+      window.selectedTags = [];
+      document.getElementById('selectedTagsDisplay').textContent = 'nenhuma';
+    };
+
+    // ====== LIGHTBOX GLOBAL ======
+    window.lightboxPreview = (url) => {
+      lightboxImg.src = url;
+      lightboxModal.classList.remove('hidden');
+    };
+    closeLightbox.addEventListener('click', () => lightboxModal.classList.add('hidden'));
+    lightboxModal.addEventListener('click', (e) => { if (e.target === lightboxModal) lightboxModal.classList.add('hidden'); });
+
+    // ====== CARREGAR RECURSOS DO FIRESTORE ======
+    async function loadResources() {
+      try {
+        const q = query(collection(db, 'recursos'), orderBy('titulo'));
+        const snap = await getDocs(q);
+        allResources = [];
+        snap.forEach(docSnap => {
+          allResources.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        renderTab(currentTab);
+        if (currentUser) renderAdminTable();
+      } catch (e) {
+        console.error('Erro ao carregar recursos:', e);
+      }
+    }
+
+    // ====== RENDER TABELA ADMIN ======
+    function renderAdminTable() {
+      if (!adminTableBody) return;
+      if (allResources.length === 0) {
+        adminTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 py-6">Nenhum recurso cadastrado</td></tr>`;
+        return;
+      }
+      let html = '';
+      allResources.forEach(item => {
+        html += `<tr class="border-b border-gray-800/60 hover:bg-black/20 transition">
+          <td class="px-4 py-3 font-medium text-white">${item.titulo}</td>
+          <td class="px-4 py-3 capitalize">${item.categoria}</td>
+          <td class="px-4 py-3">
+            <button onclick="window.deleteResource('${item.id}')" class="bg-red-800/40 hover:bg-red-700 text-red-300 px-4 py-1 rounded-full text-xs transition">Excluir</button>
+          </td>
+        </tr>`;
+      });
+      adminTableBody.innerHTML = html;
+    }
+
+    // ====== DELETE RESOURCE GLOBAL ======
+    window.deleteResource = async (id) => {
+      if (!confirm('Excluir este recurso permanentemente?')) return;
+      try {
+        await deleteDoc(doc(db, 'recursos', id));
+        await loadResources();
+        if (currentUser) renderAdminTable();
+        uploadStatus.textContent = '✅ Recurso excluído com sucesso!';
+        uploadStatus.style.color = '#4ade80';
+        setTimeout(() => {
+          uploadStatus.textContent = '';
+          uploadStatus.style.color = '';
+        }, 3000);
+      } catch (e) {
+        alert('Erro ao excluir: ' + e.message);
+      }
+    };
+
+    // ====== UPLOAD ======
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const title = document.getElementById('uploadTitle').value.trim();
+      const category = document.getElementById('uploadCategory').value;
+      const thumbnail = document.getElementById('uploadThumbnail').value.trim();
+      const downloadUrl = document.getElementById('uploadDownloadUrl').value.trim();
+      
+      if (!title || !thumbnail || !downloadUrl) {
+        uploadStatus.textContent = '❌ Preencha todos os campos';
+        uploadStatus.style.color = '#ef4444';
+        return;
+      }
+
+      uploadStatus.textContent = '⏳ Adicionando recurso...';
+      uploadStatus.style.color = '#60a5fa';
+      
+      try {
+        await addDoc(collection(db, 'recursos'), {
+          titulo: title,
+          categoria: category,
+          thumbnail: thumbnail,
+          downloadUrl: downloadUrl,
+          createdAt: new Date()
+        });
+
+        uploadStatus.textContent = '✅ Recurso adicionado com sucesso!';
+        uploadStatus.style.color = '#4ade80';
+        
+        // Limpa o formulário
+        document.getElementById('uploadTitle').value = '';
+        document.getElementById('uploadCategory').value = 'audio';
+        document.getElementById('uploadThumbnail').value = '';
+        document.getElementById('uploadDownloadUrl').value = '';
+        
+        // Recarrega os recursos e atualiza a visualização
+        await loadResources();
+        if (currentUser) renderAdminTable();
+        
+        // Navega para a aba da categoria
+        const tabMap = { audio: 'audios', video: 'videos', imagem: 'imagens', arquivo: 'arquivos' };
+        const tabName = tabMap[category] || 'audios';
+        document.querySelector(`[data-tab="${tabName}"]`)?.click();
+        
+        setTimeout(() => {
+          uploadStatus.textContent = '';
+          uploadStatus.style.color = '';
+        }, 5000);
+        
+      } catch (err) {
+        uploadStatus.textContent = '❌ Erro: ' + err.message;
+        uploadStatus.style.color = '#ef4444';
+        console.error(err);
+      }
     });
 
-    // ========== LINKTREE RIPPLE ==========
-    document.getElementById('linktreeBtn').addEventListener('click', function(e) {
-      const rect = this.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple';
-      const size = Math.max(rect.width, rect.height);
-      ripple.style.width = ripple.style.height = size + 'px';
-      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-      ripple.style.background = 'rgba(255,255,255,0.2)';
-      this.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
+    // ====== LOGIN ======
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+      
+      if (user === VALID_USER && pass === VALID_PASSWORD) {
+        loginError.textContent = '';
+        loginModal.classList.add('hidden');
+        currentUser = { displayName: 'DOCKAZE' };
+        adminDashboard.classList.remove('hidden');
+        adminIndicator.classList.remove('hidden');
+        loadResources().then(() => renderAdminTable());
+        document.body.style.overflow = 'hidden';
+      } else {
+        loginError.textContent = 'Usuário ou senha incorretos';
+      }
     });
 
-    // ========== INICIALIZAÇÃO ==========
-    // Mostrar uma frase motivacional ao carregar
-    setTimeout(() => {
-      showRandomMotivation();
-    }, 500);
+    // ====== LOGOUT ======
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      adminDashboard.classList.add('hidden');
+      adminIndicator.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      loadResources();
+    });
 
-    console.log('🚀 GERADOR DE SENSI - DOCKAZE carregado!');
-    console.log('📊 Total de gerações:', totalGen);
+    // ====== ABRIR MODAL LOGIN ======
+    function openLoginModal() {
+      loginModal.classList.remove('hidden');
+      document.getElementById('loginPass').value = '';
+      loginError.textContent = '';
+    }
+    ardmLink.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
+    ardmFooter.addEventListener('click', openLoginModal);
+
+    closeLoginModal.addEventListener('click', () => loginModal.classList.add('hidden'));
+    loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.add('hidden'); });
+
+    // ====== TABS ======
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        renderTab(tab);
+      });
+    });
+
+    // ====== INICIALIZAÇÃO ======
+    loadResources().then(() => {
+      if (!document.querySelector('.tab-btn.bg-red-600\\/20')) {
+        document.querySelector('[data-tab="audios"]')?.click();
+      }
+    });
+
+    // Expõe funções para o escopo global
+    window.loadResources = loadResources;
+    window.renderAdminTable = renderAdminTable;
+
+    console.log('🔥 Plataforma Free Fire carregada com novo Firebase!');
+    console.log('📝 ARDM login: DOCKAZE / senha: ardm2025');
   </script>
 </body>
 </html>
