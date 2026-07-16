@@ -12,8 +12,7 @@
       "imports": {
         "firebase/app": "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js",
         "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js",
-        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js",
-        "firebase/storage": "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js"
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js"
       }
     }
   </script>
@@ -129,12 +128,14 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm text-gray-300">URL da Thumbnail *</label>
-            <input type="url" id="uploadThumbnail" required placeholder="https://exemplo.com/imagem.jpg" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+            <label class="block text-sm text-gray-300">Imagem de capa *</label>
+            <input type="file" id="uploadThumbnail" accept="image/*" required class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white file:mr-4 file:py-1 file:px-3 file:rounded file:bg-red-700 file:text-white file:border-0">
+            <p class="text-xs text-gray-500 mt-1">Máximo 500KB (será convertida para Base64)</p>
           </div>
           <div class="md:col-span-2">
             <label class="block text-sm text-gray-300">URL de Download *</label>
-            <input type="url" id="uploadDownloadUrl" required placeholder="https://exemplo.com/arquivo.zip" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+            <input type="url" id="uploadDownloadUrl" required placeholder="https://exemplo.com/arquivo" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
+            <p class="text-xs text-gray-500 mt-1">Link para onde o usuário será redirecionado ao clicar em Download</p>
           </div>
           <div class="md:col-span-2">
             <button type="submit" class="bg-red-600 hover:bg-red-700 transition-colors px-6 py-2 rounded-lg font-bold text-white shadow-lg shadow-red-900/30">Adicionar recurso</button>
@@ -165,10 +166,9 @@
     // ====== IMPORTS FIREBASE ======
     import { initializeApp } from 'firebase/app';
     import { getAuth } from 'firebase/auth';
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
-    import { getStorage } from 'firebase/storage';
+    import { getDatabase, ref, set, get, remove, child, push, query, orderByChild, onValue } from 'firebase/database';
 
-    // ====== CONFIG FIREBASE (NOVAS CREDENCIAIS) ======
+    // ====== CONFIG FIREBASE ======
     const firebaseConfig = {
       apiKey: "AIzaSyCykvFRXrglqPTZtZ2YukRXtkHwDQvNJO0",
       authDomain: "ferramentas-de-criacao.firebaseapp.com",
@@ -181,8 +181,7 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+    const db = getDatabase(app);
 
     // ====== REFERÊNCIAS DOM ======
     const tabContent = document.getElementById('tabContent');
@@ -211,6 +210,16 @@
     // ====== CREDENCIAIS DIRETAS ======
     const VALID_USER = "DOCKAZE";
     const VALID_PASSWORD = "ardm2025";
+
+    // ====== FUNÇÃO PARA CONVERTER IMAGEM PARA BASE64 ======
+    function imageToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
 
     // ====== RENDERIZAÇÃO DE ABAS ======
     function renderTab(tabName) {
@@ -352,19 +361,42 @@
     closeLightbox.addEventListener('click', () => lightboxModal.classList.add('hidden'));
     lightboxModal.addEventListener('click', (e) => { if (e.target === lightboxModal) lightboxModal.classList.add('hidden'); });
 
-    // ====== CARREGAR RECURSOS DO FIRESTORE ======
+    // ====== CARREGAR RECURSOS DO FIREBASE REALTIME DATABASE ======
     async function loadResources() {
       try {
-        const q = query(collection(db, 'recursos'), orderBy('titulo'));
-        const snap = await getDocs(q);
+        const dbRef = ref(db, 'recursos');
+        const snapshot = await get(dbRef);
+        
         allResources = [];
-        snap.forEach(docSnap => {
-          allResources.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          // Converter objeto para array
+          Object.keys(data).forEach(key => {
+            allResources.push({
+              id: key,
+              ...data[key]
+            });
+          });
+          // Ordenar por título
+          allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
+        }
+        
         renderTab(currentTab);
         if (currentUser) renderAdminTable();
       } catch (e) {
         console.error('Erro ao carregar recursos:', e);
+        // Fallback para dados locais se o Firebase falhar
+        if (allResources.length === 0) {
+          // Tenta carregar do localStorage como fallback
+          const localData = localStorage.getItem('ff_resources_fallback');
+          if (localData) {
+            try {
+              allResources = JSON.parse(localData);
+              renderTab(currentTab);
+              if (currentUser) renderAdminTable();
+            } catch (err) {}
+          }
+        }
       }
     }
 
@@ -392,7 +424,8 @@
     window.deleteResource = async (id) => {
       if (!confirm('Excluir este recurso permanentemente?')) return;
       try {
-        await deleteDoc(doc(db, 'recursos', id));
+        const dbRef = ref(db, `recursos/${id}`);
+        await remove(dbRef);
         await loadResources();
         if (currentUser) renderAdminTable();
         uploadStatus.textContent = '✅ Recurso excluído com sucesso!';
@@ -412,25 +445,39 @@
       
       const title = document.getElementById('uploadTitle').value.trim();
       const category = document.getElementById('uploadCategory').value;
-      const thumbnail = document.getElementById('uploadThumbnail').value.trim();
+      const fileInput = document.getElementById('uploadThumbnail');
       const downloadUrl = document.getElementById('uploadDownloadUrl').value.trim();
+      const file = fileInput.files[0];
       
-      if (!title || !thumbnail || !downloadUrl) {
+      if (!title || !file || !downloadUrl) {
         uploadStatus.textContent = '❌ Preencha todos os campos';
         uploadStatus.style.color = '#ef4444';
         return;
       }
 
-      uploadStatus.textContent = '⏳ Adicionando recurso...';
+      // Verificar tamanho do arquivo (máximo 500KB)
+      if (file.size > 500 * 1024) {
+        uploadStatus.textContent = '❌ A imagem deve ter no máximo 500KB';
+        uploadStatus.style.color = '#ef4444';
+        return;
+      }
+
+      uploadStatus.textContent = '⏳ Convertendo imagem e adicionando recurso...';
       uploadStatus.style.color = '#60a5fa';
       
       try {
-        await addDoc(collection(db, 'recursos'), {
+        // Converter imagem para Base64
+        const thumbnailBase64 = await imageToBase64(file);
+        
+        // Salvar no Firebase Realtime Database
+        const dbRef = ref(db, 'recursos');
+        const newRef = push(dbRef);
+        await set(newRef, {
           titulo: title,
           categoria: category,
-          thumbnail: thumbnail,
+          thumbnail: thumbnailBase64,
           downloadUrl: downloadUrl,
-          createdAt: new Date()
+          createdAt: Date.now()
         });
 
         uploadStatus.textContent = '✅ Recurso adicionado com sucesso!';
@@ -518,12 +565,31 @@
       }
     });
 
+    // ====== ESCUTAR MUDANÇAS EM TEMPO REAL ======
+    const dbRef = ref(db, 'recursos');
+    onValue(dbRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        allResources = [];
+        Object.keys(data).forEach(key => {
+          allResources.push({
+            id: key,
+            ...data[key]
+          });
+        });
+        allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
+        renderTab(currentTab);
+        if (currentUser) renderAdminTable();
+      }
+    });
+
     // Expõe funções para o escopo global
     window.loadResources = loadResources;
     window.renderAdminTable = renderAdminTable;
 
-    console.log('🔥 Plataforma Free Fire carregada com novo Firebase!');
+    console.log('🔥 Plataforma Free Fire carregada!');
     console.log('📝 ARDM login: DOCKAZE / senha: ardm2025');
+    console.log('📦 Usando Firebase Realtime Database (gratuito)');
   </script>
 </body>
 </html>
