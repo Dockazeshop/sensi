@@ -48,11 +48,13 @@
       <button data-tab="hashtags" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200"># Hashtags</button>
     </div>
 
-    <div id="connectionStatus" class="text-xs mb-4 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 inline-block">
-      🔄 Conectando ao Firebase...
+    <div id="connectionStatus" class="text-xs mb-4 px-3 py-1 rounded-full bg-green-500/20 text-green-400 inline-block">
+      ✅ Conectado ao Firebase
     </div>
 
-    <div id="tabContent" class="min-h-[400px]"></div>
+    <div id="tabContent" class="min-h-[400px]">
+      <div class="text-center py-10 text-gray-400">Carregando recursos...</div>
+    </div>
 
     <footer class="mt-20 border-t border-gray-800/60 pt-6 pb-4 text-xs text-gray-500 flex flex-wrap justify-between items-center">
       <div class="flex items-center gap-4">
@@ -154,7 +156,7 @@
   <script type="module">
     import { initializeApp } from 'firebase/app';
     import { getAuth } from 'firebase/auth';
-    import { getDatabase, ref, set, get, remove, push, onValue, onDisconnect } from 'firebase/database';
+    import { getDatabase, ref, set, get, remove, onValue } from 'firebase/database';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCykvFRXrglqPTZtZ2YukRXtkHwDQvNJO0",
@@ -193,7 +195,6 @@
     let currentUser = null;
     let allResources = [];
     let currentTab = 'audios';
-    let isFirebaseConnected = false;
 
     const VALID_USER = "DOCKAZE";
     const VALID_PASSWORD = "ardm2025";
@@ -213,9 +214,14 @@
       return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
 
-    // RENDERIZAÇÃO DE ABAS
+    // ====== FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO ======
     function renderTab(tabName) {
       currentTab = tabName;
+      
+      console.log(`🎨 Renderizando aba: ${tabName}`);
+      console.log(`📦 Total de recursos: ${allResources.length}`);
+      
+      // Atualiza estilo dos botões
       tabBtns.forEach(btn => {
         const isActive = btn.dataset.tab === tabName;
         btn.classList.toggle('bg-red-600/20', isActive);
@@ -226,18 +232,24 @@
         btn.classList.toggle('border-transparent', !isActive);
       });
 
+      // Se for hashtags, renderiza separado
       if (tabName === 'hashtags') {
         renderHashtags();
         return;
       }
 
+      // Filtra recursos pela categoria
       const filtered = allResources.filter(r => r.categoria === tabName);
+      
+      console.log(`📊 Encontrados ${filtered.length} recursos na categoria "${tabName}"`);
+      
       if (filtered.length === 0) {
         tabContent.innerHTML = `<div class="text-gray-500 text-center py-16 text-lg">Nenhum recurso disponível em <span class="text-red-400">${tabName}</span></div>`;
         return;
       }
 
       let html = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">`;
+      
       filtered.forEach(item => {
         const isImage = item.categoria === 'imagem';
         const isAudio = item.categoria === 'audio';
@@ -245,13 +257,15 @@
 
         let card = `<div class="bg-[#141414] border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-1">`;
         
+        // Thumbnail
         if (isImage) {
           card += `<div class="h-48 bg-black/60 relative group cursor-pointer" onclick="window.lightboxPreview('${item.thumbnail}')">
             <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition"></div>
           </div>`;
         } else if (isVideo) {
           card += `<div class="h-48 bg-black/60 relative overflow-hidden">
-            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover">
+            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover transition duration-300 hover:scale-105">
             <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
               <span class="text-4xl">▶️</span>
             </div>
@@ -282,11 +296,12 @@
         card += `</div>`;
         html += card;
       });
+      
       html += `</div>`;
       tabContent.innerHTML = html;
     }
 
-    // HASHTAGS
+    // ====== HASHTAGS ======
     function renderHashtags() {
       const tags = {
         'Clips': ['#FreeFireClips', '#FFClips', '#FreeFireHighlights', '#MelhoresMomentos'],
@@ -322,7 +337,7 @@
       document.getElementById('selectedTagsDisplay').textContent = 'nenhuma';
     }
 
-    // FUNÇÕES GLOBAIS
+    // ====== FUNÇÕES GLOBAIS ======
     window.copyTags = (str) => {
       navigator.clipboard.writeText(str).then(() => alert('Hashtags copiadas!')).catch(() => {});
     };
@@ -348,12 +363,14 @@
     closeLightbox.addEventListener('click', () => lightboxModal.classList.add('hidden'));
     lightboxModal.addEventListener('click', (e) => { if (e.target === lightboxModal) lightboxModal.classList.add('hidden'); });
 
-    // CARREGAR RECURSOS DO FIREBASE
+    // ====== CARREGAR RECURSOS DO FIREBASE ======
     async function loadResources() {
       try {
         const dbRef = ref(db, 'recursos');
         const snapshot = await get(dbRef);
+        
         allResources = [];
+        
         if (snapshot.exists()) {
           const data = snapshot.val();
           Object.keys(data).forEach(key => {
@@ -361,40 +378,37 @@
           });
           allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
         }
+        
+        console.log('✅ Recursos carregados do Firebase:', allResources.length);
+        
+        // Renderiza a aba atual
         renderTab(currentTab);
+        
+        // Se estiver logado, atualiza a tabela admin
         if (currentUser) renderAdminTable();
         
-        // Atualizar status
-        isFirebaseConnected = true;
         connectionStatus.innerHTML = '✅ Conectado ao Firebase (sincronização em tempo real)';
         connectionStatus.className = 'text-xs mb-4 px-3 py-1 rounded-full bg-green-500/20 text-green-400 inline-block';
         return true;
       } catch (e) {
-        console.error('Erro ao carregar do Firebase:', e);
-        isFirebaseConnected = false;
-        connectionStatus.innerHTML = '❌ Erro ao conectar ao Firebase - Verifique as regras';
+        console.error('❌ Erro ao carregar do Firebase:', e);
+        connectionStatus.innerHTML = '❌ Erro ao conectar ao Firebase';
         connectionStatus.className = 'text-xs mb-4 px-3 py-1 rounded-full bg-red-500/20 text-red-400 inline-block';
-        
-        // Tentar carregar do localStorage como fallback
-        const localData = localStorage.getItem('ff_resources_backup');
-        if (localData) {
-          try {
-            allResources = JSON.parse(localData);
-            renderTab(currentTab);
-            if (currentUser) renderAdminTable();
-          } catch (err) {}
-        }
         return false;
       }
     }
 
-    // RENDER TABELA ADMIN
+    // ====== RENDER TABELA ADMIN ======
     function renderAdminTable() {
       if (!adminTableBody) return;
+      
+      console.log('📋 Renderizando tabela admin com', allResources.length, 'recursos');
+      
       if (allResources.length === 0) {
         adminTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500 py-6">Nenhum recurso cadastrado</td></tr>`;
         return;
       }
+      
       let html = '';
       allResources.forEach(item => {
         html += `<tr class="border-b border-gray-800/60 hover:bg-black/20 transition">
@@ -408,14 +422,13 @@
       adminTableBody.innerHTML = html;
     }
 
-    // DELETE RESOURCE
+    // ====== DELETE RESOURCE ======
     window.deleteResource = async (id) => {
       if (!confirm('Excluir este recurso permanentemente?')) return;
       
       try {
         const dbRef = ref(db, `recursos/${id}`);
         await remove(dbRef);
-        // O onValue vai atualizar automaticamente
         uploadStatus.textContent = '✅ Recurso excluído com sucesso!';
         uploadStatus.style.color = '#4ade80';
         setTimeout(() => {
@@ -427,7 +440,7 @@
       }
     };
 
-    // UPLOAD
+    // ====== UPLOAD ======
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -468,18 +481,14 @@
         const dbRef = ref(db, `recursos/${id}`);
         await set(dbRef, newResource);
         
-        // Backup local
-        localStorage.setItem('ff_resources_backup', JSON.stringify(allResources));
-
         uploadStatus.textContent = '✅ Recurso adicionado com sucesso!';
         uploadStatus.style.color = '#4ade80';
         
+        // Limpa o formulário
         document.getElementById('uploadTitle').value = '';
         document.getElementById('uploadCategory').value = 'audio';
         document.getElementById('uploadThumbnail').value = '';
         document.getElementById('uploadDownloadUrl').value = '';
-        
-        // O onValue vai atualizar automaticamente
         
         setTimeout(() => {
           uploadStatus.textContent = '';
@@ -493,7 +502,7 @@
       }
     });
 
-    // LOGIN
+    // ====== LOGIN ======
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const user = document.getElementById('loginUser').value.trim();
@@ -506,7 +515,7 @@
         adminDashboard.classList.remove('hidden');
         adminIndicator.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        loadResources().then(() => renderAdminTable());
+        renderAdminTable();
       } else {
         loginError.textContent = 'Usuário ou senha incorretos';
       }
@@ -529,6 +538,7 @@
     closeLoginModal.addEventListener('click', () => loginModal.classList.add('hidden'));
     loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.add('hidden'); });
 
+    // ====== TABS ======
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
@@ -539,6 +549,8 @@
     // ====== ESCUTAR MUDANÇAS EM TEMPO REAL ======
     const dbRef = ref(db, 'recursos');
     onValue(dbRef, (snapshot) => {
+      console.log('🔄 Mudança detectada no Firebase!');
+      
       if (snapshot.exists()) {
         const data = snapshot.val();
         allResources = [];
@@ -546,38 +558,45 @@
           allResources.push({ id: key, ...data[key] });
         });
         allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
+        
+        console.log(`📦 Recursos atualizados: ${allResources.length} itens`);
+        
+        // ATUALIZA A VISUALIZAÇÃO PÚBLICA
         renderTab(currentTab);
+        
+        // Se estiver logado, atualiza a tabela admin
         if (currentUser) renderAdminTable();
+        
         // Backup local
         localStorage.setItem('ff_resources_backup', JSON.stringify(allResources));
-        
-        // Atualizar status
-        connectionStatus.innerHTML = '✅ Conectado ao Firebase (sincronização em tempo real)';
-        connectionStatus.className = 'text-xs mb-4 px-3 py-1 rounded-full bg-green-500/20 text-green-400 inline-block';
       } else {
         allResources = [];
         renderTab(currentTab);
         if (currentUser) renderAdminTable();
       }
     }, (error) => {
-      console.error('Erro na conexão em tempo real:', error);
-      connectionStatus.innerHTML = '⚠️ Modo offline - Alterações salvas localmente';
-      connectionStatus.className = 'text-xs mb-4 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 inline-block';
+      console.error('❌ Erro na conexão em tempo real:', error);
     });
 
-    // INICIALIZAÇÃO
+    // ====== INICIALIZAÇÃO ======
+    console.log('🚀 Inicializando plataforma...');
+    
+    // Carrega os recursos
     await loadResources();
     
-    if (!document.querySelector('.tab-btn.bg-red-600\\/20')) {
+    // Garante que a aba "audios" está ativa
+    const activeTab = document.querySelector('.tab-btn.bg-red-600\\/20');
+    if (!activeTab) {
       document.querySelector('[data-tab="audios"]')?.click();
     }
-
-    window.loadResources = loadResources;
-    window.renderAdminTable = renderAdminTable;
+    
+    // Força a renderização da aba atual
+    renderTab(currentTab);
 
     console.log('🔥 Plataforma Free Fire carregada!');
     console.log('📝 ARDM login: DOCKAZE / senha: ardm2025');
     console.log('📡 Sincronização em tempo real ativada');
+    console.log(`📦 Total de recursos: ${allResources.length}`);
   </script>
 </body>
 </html>
