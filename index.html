@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ferramentas de criação · Free Fire</title>
-  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase Modular SDK v10 (CDN) -->
   <script type="importmap">
     {
       "imports": {
@@ -19,7 +17,6 @@
 </head>
 <body class="bg-[#0b0b0b] text-gray-100 font-sans antialiased">
 
-  <!-- ====== HEADER / HERO ====== -->
   <header class="relative bg-gradient-to-r from-[#1a0505] via-[#2a0a0a] to-[#1a0505] border-b border-red-700/40 shadow-xl shadow-red-900/20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between">
       <div class="flex items-center space-x-3">
@@ -41,10 +38,8 @@
     </div>
   </header>
 
-  <!-- ====== CONTEÚDO PRINCIPAL ====== -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- ====== ABAS ====== -->
     <div class="flex flex-wrap gap-2 border-b border-gray-800 pb-3 mb-8">
       <button data-tab="audios" class="tab-btn px-6 py-2 rounded-full bg-red-600/20 text-red-400 font-semibold border border-red-600/30 hover:bg-red-600/40 transition-all duration-200">🎧 Áudios</button>
       <button data-tab="videos" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200">🎬 Vídeos</button>
@@ -53,12 +48,8 @@
       <button data-tab="hashtags" class="tab-btn px-6 py-2 rounded-full bg-gray-800/60 text-gray-300 font-semibold hover:bg-gray-700/60 transition-all duration-200"># Hashtags</button>
     </div>
 
-    <!-- ====== CONTAINER DAS ABAS ====== -->
-    <div id="tabContent" class="min-h-[400px]">
-      <!-- conteúdo renderizado via js -->
-    </div>
+    <div id="tabContent" class="min-h-[400px]"></div>
 
-    <!-- ====== RODAPÉ ====== -->
     <footer class="mt-20 border-t border-gray-800/60 pt-6 pb-4 text-xs text-gray-500 flex flex-wrap justify-between items-center">
       <div class="flex items-center gap-4">
         <a href="https://www.instagram.com/dockaze_ff?igsh=dzh3YWhwcHZwcmFp" target="_blank" class="text-gray-400 hover:text-red-400 transition-colors">📸 Instagram</a>
@@ -73,7 +64,7 @@
     </footer>
   </main>
 
-  <!-- ====== MODAL DE LOGIN ARDM ====== -->
+  <!-- MODAL LOGIN -->
   <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-opacity duration-300">
     <div class="bg-[#1a1a1a] border border-red-700/40 rounded-2xl p-8 max-w-sm w-full shadow-2xl shadow-red-900/30">
       <h2 class="text-2xl font-bold text-white mb-1">🔐 Acesso ARDM</h2>
@@ -94,7 +85,7 @@
     </div>
   </div>
 
-  <!-- ====== MODAL DE VISUALIZAÇÃO (IMAGENS LIGHTBOX) ====== -->
+  <!-- LIGHTBOX -->
   <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-opacity duration-300">
     <div class="relative max-w-4xl max-h-[90vh] p-4">
       <img id="lightboxImg" src="" alt="preview" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border border-red-900/30 object-contain">
@@ -102,7 +93,7 @@
     </div>
   </div>
 
-  <!-- ====== DASHBOARD ARDM (PAINEL ADMIN) ====== -->
+  <!-- DASHBOARD ADMIN -->
   <div id="adminDashboard" class="hidden fixed inset-0 z-40 bg-[#0a0a0a] overflow-y-auto pt-20 pb-10 px-4">
     <div class="max-w-5xl mx-auto">
       <div class="flex justify-between items-center border-b border-red-800/50 pb-4 mb-6">
@@ -110,9 +101,11 @@
         <button id="logoutBtn" class="bg-red-700 hover:bg-red-800 px-5 py-2 rounded-lg font-bold text-sm transition-colors">Sair</button>
       </div>
 
-      <!-- Formulário de Upload -->
       <div class="bg-[#151515] border border-red-900/30 rounded-2xl p-6 mb-10">
         <h3 class="text-xl font-semibold text-white mb-4">📤 Adicionar recurso</h3>
+        <div id="connectionStatus" class="text-xs mb-3 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 inline-block">
+          ⚡ Modo Local (Firebase indisponível)
+        </div>
         <form id="uploadForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="md:col-span-2">
             <label class="block text-sm text-gray-300">Título *</label>
@@ -130,12 +123,11 @@
           <div>
             <label class="block text-sm text-gray-300">Imagem de capa *</label>
             <input type="file" id="uploadThumbnail" accept="image/*" required class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white file:mr-4 file:py-1 file:px-3 file:rounded file:bg-red-700 file:text-white file:border-0">
-            <p class="text-xs text-gray-500 mt-1">Máximo 500KB (será convertida para Base64)</p>
+            <p class="text-xs text-gray-500 mt-1">Máximo 500KB</p>
           </div>
           <div class="md:col-span-2">
             <label class="block text-sm text-gray-300">URL de Download *</label>
             <input type="url" id="uploadDownloadUrl" required placeholder="https://exemplo.com/arquivo" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white">
-            <p class="text-xs text-gray-500 mt-1">Link para onde o usuário será redirecionado ao clicar em Download</p>
           </div>
           <div class="md:col-span-2">
             <button type="submit" class="bg-red-600 hover:bg-red-700 transition-colors px-6 py-2 rounded-lg font-bold text-white shadow-lg shadow-red-900/30">Adicionar recurso</button>
@@ -144,7 +136,6 @@
         <div id="uploadStatus" class="text-sm text-gray-400 mt-3"></div>
       </div>
 
-      <!-- Tabela de gerenciamento -->
       <div>
         <h3 class="text-xl font-semibold text-white mb-4">📋 Recursos cadastrados</h3>
         <div id="adminTableContainer" class="bg-[#151515] border border-red-900/30 rounded-2xl overflow-x-auto p-2">
@@ -152,23 +143,18 @@
             <thead class="text-xs uppercase bg-black/40 text-gray-400 border-b border-red-900/30">
               <tr><th class="px-4 py-3">Título</th><th class="px-4 py-3">Categoria</th><th class="px-4 py-3">Ações</th></tr>
             </thead>
-            <tbody id="adminTableBody">
-              <!-- preenchido via js -->
-            </tbody>
+            <tbody id="adminTableBody"></tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SCRIPTS ====== -->
   <script type="module">
-    // ====== IMPORTS FIREBASE ======
     import { initializeApp } from 'firebase/app';
     import { getAuth } from 'firebase/auth';
-    import { getDatabase, ref, set, get, remove, child, push, query, orderByChild, onValue } from 'firebase/database';
+    import { getDatabase, ref, set, get, remove, push, onValue } from 'firebase/database';
 
-    // ====== CONFIG FIREBASE ======
     const firebaseConfig = {
       apiKey: "AIzaSyCykvFRXrglqPTZtZ2YukRXtkHwDQvNJO0",
       authDomain: "ferramentas-de-criacao.firebaseapp.com",
@@ -183,7 +169,7 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ====== REFERÊNCIAS DOM ======
+    // DOM References
     const tabContent = document.getElementById('tabContent');
     const tabBtns = document.querySelectorAll('.tab-btn');
     const loginModal = document.getElementById('loginModal');
@@ -201,17 +187,35 @@
     const lightboxModal = document.getElementById('lightboxModal');
     const lightboxImg = document.getElementById('lightboxImg');
     const closeLightbox = document.getElementById('closeLightbox');
+    const connectionStatus = document.getElementById('connectionStatus');
 
-    // ====== ESTADO ======
     let currentUser = null;
     let allResources = [];
     let currentTab = 'audios';
+    let useFirebase = true;
 
-    // ====== CREDENCIAIS DIRETAS ======
     const VALID_USER = "DOCKAZE";
     const VALID_PASSWORD = "ardm2025";
 
-    // ====== FUNÇÃO PARA CONVERTER IMAGEM PARA BASE64 ======
+    // Verificar conexão com Firebase
+    async function checkFirebaseConnection() {
+      try {
+        const dbRef = ref(db, 'test');
+        await set(dbRef, { test: 'connection' });
+        await remove(dbRef);
+        connectionStatus.innerHTML = '✅ Conectado ao Firebase';
+        connectionStatus.className = 'text-xs mb-3 px-3 py-1 rounded-full bg-green-500/20 text-green-400 inline-block';
+        useFirebase = true;
+        return true;
+      } catch (error) {
+        connectionStatus.innerHTML = '⚠️ Modo Local (Firebase indisponível)';
+        connectionStatus.className = 'text-xs mb-3 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 inline-block';
+        useFirebase = false;
+        return false;
+      }
+    }
+
+    // Função para converter imagem para Base64
     function imageToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -221,7 +225,31 @@
       });
     }
 
-    // ====== RENDERIZAÇÃO DE ABAS ======
+    // Gerar ID único
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // Salvar no LocalStorage
+    function saveToLocalStorage() {
+      localStorage.setItem('ff_resources', JSON.stringify(allResources));
+    }
+
+    // Carregar do LocalStorage
+    function loadFromLocalStorage() {
+      const data = localStorage.getItem('ff_resources');
+      if (data) {
+        try {
+          allResources = JSON.parse(data);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      return false;
+    }
+
+    // RENDERIZAÇÃO DE ABAS
     function renderTab(tabName) {
       currentTab = tabName;
       tabBtns.forEach(btn => {
@@ -250,19 +278,16 @@
         const isImage = item.categoria === 'imagem';
         const isAudio = item.categoria === 'audio';
         const isVideo = item.categoria === 'video';
-        const isFile = item.categoria === 'arquivo';
 
         let card = `<div class="bg-[#141414] border border-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-red-900/20 transition-all duration-300 hover:-translate-y-1">`;
         
-        // Thumbnail
         if (isImage) {
           card += `<div class="h-48 bg-black/60 relative group cursor-pointer" onclick="window.lightboxPreview('${item.thumbnail}')">
             <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
-            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition"></div>
           </div>`;
         } else if (isVideo) {
           card += `<div class="h-48 bg-black/60 relative overflow-hidden">
-            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover transition duration-300 hover:scale-105">
+            <img src="${item.thumbnail}" alt="${item.titulo}" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
               <span class="text-4xl">▶️</span>
             </div>
@@ -297,7 +322,7 @@
       tabContent.innerHTML = html;
     }
 
-    // ====== HASHTAGS ======
+    // HASHTAGS
     function renderHashtags() {
       const tags = {
         'Clips': ['#FreeFireClips', '#FFClips', '#FreeFireHighlights', '#MelhoresMomentos'],
@@ -333,7 +358,7 @@
       document.getElementById('selectedTagsDisplay').textContent = 'nenhuma';
     }
 
-    // ====== FUNÇÕES GLOBAIS PARA HASHTAGS ======
+    // FUNÇÕES GLOBAIS
     window.copyTags = (str) => {
       navigator.clipboard.writeText(str).then(() => alert('Hashtags copiadas!')).catch(() => {});
     };
@@ -352,8 +377,6 @@
       window.selectedTags = [];
       document.getElementById('selectedTagsDisplay').textContent = 'nenhuma';
     };
-
-    // ====== LIGHTBOX GLOBAL ======
     window.lightboxPreview = (url) => {
       lightboxImg.src = url;
       lightboxModal.classList.remove('hidden');
@@ -361,46 +384,40 @@
     closeLightbox.addEventListener('click', () => lightboxModal.classList.add('hidden'));
     lightboxModal.addEventListener('click', (e) => { if (e.target === lightboxModal) lightboxModal.classList.add('hidden'); });
 
-    // ====== CARREGAR RECURSOS DO FIREBASE REALTIME DATABASE ======
+    // CARREGAR RECURSOS
     async function loadResources() {
-      try {
-        const dbRef = ref(db, 'recursos');
-        const snapshot = await get(dbRef);
-        
-        allResources = [];
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          // Converter objeto para array
-          Object.keys(data).forEach(key => {
-            allResources.push({
-              id: key,
-              ...data[key]
+      if (useFirebase) {
+        try {
+          const dbRef = ref(db, 'recursos');
+          const snapshot = await get(dbRef);
+          allResources = [];
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            Object.keys(data).forEach(key => {
+              allResources.push({ id: key, ...data[key] });
             });
-          });
-          // Ordenar por título
-          allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
+            allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
+          }
+          renderTab(currentTab);
+          if (currentUser) renderAdminTable();
+          return;
+        } catch (e) {
+          console.warn('Firebase falhou, usando LocalStorage:', e);
         }
-        
+      }
+
+      // Fallback para LocalStorage
+      if (loadFromLocalStorage()) {
         renderTab(currentTab);
         if (currentUser) renderAdminTable();
-      } catch (e) {
-        console.error('Erro ao carregar recursos:', e);
-        // Fallback para dados locais se o Firebase falhar
-        if (allResources.length === 0) {
-          // Tenta carregar do localStorage como fallback
-          const localData = localStorage.getItem('ff_resources_fallback');
-          if (localData) {
-            try {
-              allResources = JSON.parse(localData);
-              renderTab(currentTab);
-              if (currentUser) renderAdminTable();
-            } catch (err) {}
-          }
-        }
+      } else {
+        allResources = [];
+        renderTab(currentTab);
+        if (currentUser) renderAdminTable();
       }
     }
 
-    // ====== RENDER TABELA ADMIN ======
+    // RENDER TABELA ADMIN
     function renderAdminTable() {
       if (!adminTableBody) return;
       if (allResources.length === 0) {
@@ -420,26 +437,37 @@
       adminTableBody.innerHTML = html;
     }
 
-    // ====== DELETE RESOURCE GLOBAL ======
+    // DELETE RESOURCE
     window.deleteResource = async (id) => {
       if (!confirm('Excluir este recurso permanentemente?')) return;
-      try {
-        const dbRef = ref(db, `recursos/${id}`);
-        await remove(dbRef);
-        await loadResources();
-        if (currentUser) renderAdminTable();
-        uploadStatus.textContent = '✅ Recurso excluído com sucesso!';
-        uploadStatus.style.color = '#4ade80';
-        setTimeout(() => {
-          uploadStatus.textContent = '';
-          uploadStatus.style.color = '';
-        }, 3000);
-      } catch (e) {
-        alert('Erro ao excluir: ' + e.message);
+      
+      const index = allResources.findIndex(r => r.id === id);
+      if (index === -1) return;
+      
+      allResources.splice(index, 1);
+      
+      if (useFirebase) {
+        try {
+          const dbRef = ref(db, `recursos/${id}`);
+          await remove(dbRef);
+        } catch (e) {
+          console.warn('Erro ao excluir do Firebase, mantendo no LocalStorage:', e);
+        }
       }
+      
+      saveToLocalStorage();
+      await loadResources();
+      if (currentUser) renderAdminTable();
+      
+      uploadStatus.textContent = '✅ Recurso excluído com sucesso!';
+      uploadStatus.style.color = '#4ade80';
+      setTimeout(() => {
+        uploadStatus.textContent = '';
+        uploadStatus.style.color = '';
+      }, 3000);
     };
 
-    // ====== UPLOAD ======
+    // UPLOAD
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -455,45 +483,53 @@
         return;
       }
 
-      // Verificar tamanho do arquivo (máximo 500KB)
       if (file.size > 500 * 1024) {
         uploadStatus.textContent = '❌ A imagem deve ter no máximo 500KB';
         uploadStatus.style.color = '#ef4444';
         return;
       }
 
-      uploadStatus.textContent = '⏳ Convertendo imagem e adicionando recurso...';
+      uploadStatus.textContent = '⏳ Processando...';
       uploadStatus.style.color = '#60a5fa';
       
       try {
-        // Converter imagem para Base64
         const thumbnailBase64 = await imageToBase64(file);
+        const id = generateId();
         
-        // Salvar no Firebase Realtime Database
-        const dbRef = ref(db, 'recursos');
-        const newRef = push(dbRef);
-        await set(newRef, {
+        const newResource = {
+          id: id,
           titulo: title,
           categoria: category,
           thumbnail: thumbnailBase64,
           downloadUrl: downloadUrl,
           createdAt: Date.now()
-        });
+        };
+
+        if (useFirebase) {
+          try {
+            const dbRef = ref(db, `recursos/${id}`);
+            await set(dbRef, newResource);
+          } catch (firebaseError) {
+            console.warn('Erro ao salvar no Firebase, salvando no LocalStorage:', firebaseError);
+            allResources.push(newResource);
+            saveToLocalStorage();
+          }
+        } else {
+          allResources.push(newResource);
+          saveToLocalStorage();
+        }
 
         uploadStatus.textContent = '✅ Recurso adicionado com sucesso!';
         uploadStatus.style.color = '#4ade80';
         
-        // Limpa o formulário
         document.getElementById('uploadTitle').value = '';
         document.getElementById('uploadCategory').value = 'audio';
         document.getElementById('uploadThumbnail').value = '';
         document.getElementById('uploadDownloadUrl').value = '';
         
-        // Recarrega os recursos e atualiza a visualização
         await loadResources();
         if (currentUser) renderAdminTable();
         
-        // Navega para a aba da categoria
         const tabMap = { audio: 'audios', video: 'videos', imagem: 'imagens', arquivo: 'arquivos' };
         const tabName = tabMap[category] || 'audios';
         document.querySelector(`[data-tab="${tabName}"]`)?.click();
@@ -510,7 +546,7 @@
       }
     });
 
-    // ====== LOGIN ======
+    // LOGIN
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const user = document.getElementById('loginUser').value.trim();
@@ -529,7 +565,6 @@
       }
     });
 
-    // ====== LOGOUT ======
     logoutBtn.addEventListener('click', () => {
       currentUser = null;
       adminDashboard.classList.add('hidden');
@@ -538,7 +573,6 @@
       loadResources();
     });
 
-    // ====== ABRIR MODAL LOGIN ======
     function openLoginModal() {
       loginModal.classList.remove('hidden');
       document.getElementById('loginPass').value = '';
@@ -546,11 +580,9 @@
     }
     ardmLink.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
     ardmFooter.addEventListener('click', openLoginModal);
-
     closeLoginModal.addEventListener('click', () => loginModal.classList.add('hidden'));
     loginModal.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.add('hidden'); });
 
-    // ====== TABS ======
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
@@ -558,38 +590,38 @@
       });
     });
 
-    // ====== INICIALIZAÇÃO ======
-    loadResources().then(() => {
-      if (!document.querySelector('.tab-btn.bg-red-600\\/20')) {
-        document.querySelector('[data-tab="audios"]')?.click();
-      }
-    });
+    // INICIALIZAÇÃO
+    await checkFirebaseConnection();
+    await loadResources();
+    
+    if (!document.querySelector('.tab-btn.bg-red-600\\/20')) {
+      document.querySelector('[data-tab="audios"]')?.click();
+    }
 
-    // ====== ESCUTAR MUDANÇAS EM TEMPO REAL ======
-    const dbRef = ref(db, 'recursos');
-    onValue(dbRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        allResources = [];
-        Object.keys(data).forEach(key => {
-          allResources.push({
-            id: key,
-            ...data[key]
+    // Escutar mudanças em tempo real se Firebase estiver disponível
+    if (useFirebase) {
+      const dbRef = ref(db, 'recursos');
+      onValue(dbRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          allResources = [];
+          Object.keys(data).forEach(key => {
+            allResources.push({ id: key, ...data[key] });
           });
-        });
-        allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
-        renderTab(currentTab);
-        if (currentUser) renderAdminTable();
-      }
-    });
+          allResources.sort((a, b) => a.titulo.localeCompare(b.titulo));
+          renderTab(currentTab);
+          if (currentUser) renderAdminTable();
+          saveToLocalStorage(); // Backup local
+        }
+      });
+    }
 
-    // Expõe funções para o escopo global
     window.loadResources = loadResources;
     window.renderAdminTable = renderAdminTable;
 
     console.log('🔥 Plataforma Free Fire carregada!');
     console.log('📝 ARDM login: DOCKAZE / senha: ardm2025');
-    console.log('📦 Usando Firebase Realtime Database (gratuito)');
+    console.log('📦 Modo:', useFirebase ? 'Firebase' : 'LocalStorage');
   </script>
 </body>
 </html>
