@@ -37,6 +37,8 @@
             --success: #10B981;
             --warning: #F59E0B;
             --error: #EF4444;
+            --linktree: #39E09B;
+            --linktree-dark: #2BBF7E;
             --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
             --gradient-hover: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
             --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -90,7 +92,7 @@
         p { font-size: clamp(0.9rem, 2vw, 1rem); }
 
         /* Títulos com gradiente */
-        .tutorial-title, .section-title {
+        .tutorial-title, .section-title, .page-title {
             font-size: 2.5rem;
             font-weight: 800;
             margin-bottom: 20px;
@@ -369,20 +371,34 @@
             transform: scale(1.02);
         }
 
-        .language-selector {
+        /* Favoritos na Navbar */
+        .favoritos-btn {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(139, 92, 246, 0.2);
             border-radius: 10px;
-            padding: 8px 12px;
+            padding: 8px 15px;
             color: var(--text);
-            font-family: 'Outfit', sans-serif;
             cursor: pointer;
-            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
         }
 
-        .language-selector option {
-            background: var(--dark-light);
-            color: var(--text);
+        .favoritos-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .favoritos-btn .badge {
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
         /* Menu Horizontal */
@@ -430,14 +446,20 @@
             color: white;
         }
 
-        .menu-item.youtube {
-            background: linear-gradient(135deg, #FF0000, #CC0000);
+        .menu-item.linktree {
+            background: linear-gradient(135deg, var(--linktree), var(--linktree-dark));
             color: white;
         }
 
-        .menu-item.youtube:hover {
-            background: linear-gradient(135deg, #CC0000, #990000);
-            box-shadow: 0 5px 15px rgba(255,0,0,0.3);
+        .menu-item.linktree:hover {
+            background: linear-gradient(135deg, var(--linktree-dark), #1EA06A);
+            box-shadow: 0 5px 15px rgba(57, 224, 155, 0.3);
+        }
+
+        .menu-item.linktree svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
         }
 
         /* Main Content */
@@ -445,6 +467,30 @@
             max-width: 1200px;
             margin: 80px auto 100px;
             padding: 0 20px;
+        }
+
+        /* Seletor de idioma */
+        .idioma-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .idioma-selector {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .idioma-selector option {
+            background: var(--dark-light);
+            color: var(--text);
         }
 
         /* Header da seção com filtro */
@@ -525,6 +571,254 @@
             color: white;
         }
 
+        /* Botão Ver Todos */
+        .ver-todos-wrapper {
+            text-align: center;
+            margin: 30px 0 20px;
+        }
+
+        .btn-ver-todos {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 35px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-ver-todos:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Páginas */
+        .page-content {
+            background: rgba(26, 26, 42, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            margin-top: 20px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .page-content p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .page-content ul {
+            color: var(--text-secondary);
+            margin: 20px 0 20px 20px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .page-content ul li {
+            margin-bottom: 8px;
+        }
+
+        .page-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .page-back:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .page-back svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Página de Todos os Arquivos */
+        .todos-arquivos-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .todos-arquivos-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .todos-arquivos-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        /* Loading More */
+        #loading-more {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(139, 92, 246, 0.2);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        #end-message {
+            text-align: center;
+            padding: 30px;
+            display: none;
+            color: var(--text-muted);
+        }
+
+        /* Ranking */
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255,255,255,0.03);
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            background: rgba(255,255,255,0.06);
+            transform: translateX(5px);
+        }
+
+        .ranking-posicao {
+            font-size: 1.5rem;
+            font-weight: 800;
+            min-width: 50px;
+            color: var(--primary);
+        }
+
+        .ranking-posicao.ouro { color: #FFD700; }
+        .ranking-posicao.prata { color: #C0C0C0; }
+        .ranking-posicao.bronze { color: #CD7F32; }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .ranking-info p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .ranking-downloads {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .faq-pergunta {
+            width: 100%;
+            padding: 18px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+
+        .faq-pergunta:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .faq-pergunta .icone {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+
+        .faq-pergunta.aberto .icone {
+            transform: rotate(180deg);
+        }
+
+        .faq-resposta {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 20px;
+        }
+
+        .faq-resposta.aberto {
+            max-height: 300px;
+            padding: 0 20px 20px 20px;
+        }
+
+        .faq-resposta p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin: 10px 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         /* Games Grid */
         .games-grid {
             display: grid;
@@ -551,6 +845,7 @@
             }
         }
 
+        /* Cards com ícones para categorias especiais */
         .game-card {
             position: relative;
             background: rgba(26, 26, 42, 0.3);
@@ -590,6 +885,95 @@
         .game-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .game-card .btn-favorito {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 5;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-card .btn-favorito:hover {
+            transform: scale(1.1);
+        }
+
+        .game-card .btn-favorito.favorito {
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Cards sem imagem (Áudio, Vídeo, Imagens) */
+        .game-card.sem-imagem .card-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.1));
+            height: 150px;
+        }
+
+        .game-card.sem-imagem .card-icon {
+            font-size: 4rem;
+            opacity: 0.7;
+        }
+
+        .game-card.sem-imagem .card-image::after {
+            display: none;
+        }
+
+        /* Cards menores para categorias especiais (2 por linha) */
+        .game-card.sem-imagem .card-content {
+            padding: 12px 15px;
+        }
+
+        .game-card.sem-imagem .card-content h3 {
+            font-size: 1rem;
+        }
+
+        .game-card.sem-imagem .card-description {
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .game-card.sem-imagem .card-meta {
+            font-size: 0.7rem;
+            gap: 6px;
+        }
+
+        .game-card.sem-imagem .btn-download {
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+
+        .game-card.sem-imagem .btn-share {
+            width: 35px;
+            height: 35px;
+            font-size: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .games-grid .game-card.sem-imagem {
+                max-width: 100%;
+            }
+            .games-grid .game-card.sem-imagem .card-image {
+                height: 120px;
+            }
+            .games-grid .game-card.sem-imagem .card-icon {
+                font-size: 3rem;
+            }
         }
 
         @keyframes bordaGradiente {
@@ -1000,6 +1384,16 @@
             text-align: center;
             cursor: pointer;
             font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .file-upload-area.oculto {
+            display: none;
         }
 
         .checkbox-group {
@@ -1262,8 +1656,34 @@
             font-size: 0.85rem;
         }
 
-        .hidden {
-            display: none;
+        .footer-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .footer-menu-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 30px;
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            text-align: left;
+            width: fit-content;
+        }
+
+        .footer-menu-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--text);
+            transform: translateX(5px);
         }
     </style>
 </head>
@@ -1319,11 +1739,9 @@
                 <button class="search-button" onclick="buscarJogos()">Buscar</button>
             </div>
 
-            <select class="language-selector" onchange="mudarIdioma(this.value)">
-                <option value="pt">🇧🇷 Português</option>
-                <option value="en">🇺🇸 English</option>
-                <option value="es">🇪🇸 Español</option>
-            </select>
+            <button class="favoritos-btn" onclick="mostrarFavoritos()">
+                ❤️ Favoritos <span class="badge" id="favoritos-badge">0</span>
+            </button>
         </div>
     </nav>
 
@@ -1335,8 +1753,11 @@
         <button class="menu-item" onclick="mostrarRecentes()">
             🔄 <span data-i18n="menu.recent">Mais recentes</span>
         </button>
-        <button class="menu-item youtube" onclick="window.open('https://youtube.com/@dockaze?si=M1Li5Z82Ku09uJ7D', '_blank')">
-            ▶ YouTube
+        <button class="menu-item linktree" onclick="window.open('https://linktr.ee/DOCKAZE', '_blank')">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm1.5 17.25H9.75l2.25 2.25 2.25-2.25H13.5zm0-10.5H9.75L12 4.5l2.25 2.25H13.5zm3 3.75h-3.75v-2.25H12v2.25H8.25V10.5H12V8.25h3.75v2.25z"/>
+            </svg>
+            Linktree
         </button>
     </div>
 
@@ -1354,21 +1775,143 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Games List -->
-        <section id="games-section">
-            <div class="section-header">
-                <h2 id="titulo-lista" data-i18n="games.all">Arquivos Disponíveis</h2>
-                <div class="filter-container">
-                    <label for="filterCategoria">📂 Categoria:</label>
-                    <select class="filter-select" id="filterCategoria" onchange="filtrarPorCategoria()">
-                        <option value="todas">Todas as categorias</option>
-                        <!-- As categorias serão preenchidas dinamicamente -->
-                    </select>
-                    <button class="filter-clear" onclick="limparFiltro()">Limpar</button>
+        <!-- Seletor de idioma -->
+        <div class="idioma-container">
+            <select class="idioma-selector" onchange="mudarIdioma(this.value)">
+                <option value="pt">🇧🇷 Português</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="es">🇪🇸 Español</option>
+            </select>
+        </div>
+
+        <!-- Página Sobre -->
+        <div id="pagina-sobre" class="hidden">
+            <button class="page-back" onclick="voltarParaHome()">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Voltar
+            </button>
+            <div class="page-content">
+                <h2 class="page-title">Sobre o Ferramentas do Criador</h2>
+                <p><strong>Bem-vindo ao Ferramentas do Criador!</strong> Este site foi criado com o objetivo de reunir em um só lugar os melhores recursos, ferramentas e arquivos essenciais para criadores de conteúdo digital.</p>
+                <p>Sabemos que criar conteúdo de qualidade exige dedicação, criatividade e as ferramentas certas. Por isso, selecionamos cuidadosamente cada recurso disponível aqui, desde templates de design até presets de edição, samples de áudio e muito mais.</p>
+                <p><strong>Nossa missão</strong> é facilitar a vida dos criadores, oferecendo acesso rápido a arquivos que podem impulsionar seus projetos e economizar seu tempo. Tudo em um ambiente seguro, moderno e de fácil navegação.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 20px;">📅 Última atualização: Março de 2026</p>
+            </div>
+        </div>
+
+        <!-- Página Privacidade -->
+        <div id="pagina-privacidade" class="hidden">
+            <button class="page-back" onclick="voltarParaHome()">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Voltar
+            </button>
+            <div class="page-content">
+                <h2 class="page-title">Política de Privacidade</h2>
+                <p><strong>Última atualização:</strong> Março de 2026</p>
+                <p>O <strong>Ferramentas do Criador</strong> valoriza sua privacidade...</p>
+                <p style="color: var(--text-muted);">[Conteúdo completo da política de privacidade]</p>
+            </div>
+        </div>
+
+        <!-- Página Ranking -->
+        <div id="pagina-ranking" class="hidden">
+            <button class="page-back" onclick="voltarParaHome()">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Voltar
+            </button>
+            <div class="page-content">
+                <h2 class="page-title">🏆 Ranking de Downloads</h2>
+                <p>Os arquivos mais baixados pelos criadores. Veja o que está em alta!</p>
+                <div class="ranking-list" id="ranking-list"></div>
+            </div>
+        </div>
+
+        <!-- Página FAQ -->
+        <div id="pagina-faq" class="hidden">
+            <button class="page-back" onclick="voltarParaHome()">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Voltar
+            </button>
+            <div class="page-content">
+                <h2 class="page-title">❓ Perguntas Frequentes (FAQ)</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-pergunta" onclick="toggleFAQ(this)">
+                            <span>🔄 Como faço para baixar os arquivos?</span>
+                            <span class="icone">▼</span>
+                        </button>
+                        <div class="faq-resposta"><p>É muito simples! Basta clicar no botão <strong>"Baixar"</strong> no card do arquivo desejado.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-pergunta" onclick="toggleFAQ(this)">
+                            <span>🛡️ Os arquivos são seguros?</span>
+                            <span class="icone">▼</span>
+                        </button>
+                        <div class="faq-resposta"><p>Sim! Todos os arquivos passam por verificação antes de serem publicados.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-pergunta" onclick="toggleFAQ(this)">
+                            <span>💰 Tem algum custo para usar o site?</span>
+                            <span class="icone">▼</span>
+                        </button>
+                        <div class="faq-resposta"><p>Não! O <strong>Ferramentas do Criador</strong> é completamente gratuito.</p></div>
+                    </div>
                 </div>
             </div>
-            <div id="apk-grid" class="games-grid"></div>
-        </section>
+        </div>
+
+        <!-- Página Todos os Arquivos -->
+        <div id="pagina-todos" class="hidden">
+            <button class="page-back" onclick="voltarParaHome()">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Voltar
+            </button>
+            <div class="page-content">
+                <div class="todos-arquivos-header">
+                    <h2>📁 Todos os Arquivos</h2>
+                    <div class="filter-container">
+                        <label for="filterCategoriaTodos">📂 Categoria:</label>
+                        <select class="filter-select" id="filterCategoriaTodos" onchange="filtrarTodos()">
+                            <option value="todas">Todas as categorias</option>
+                        </select>
+                        <button class="filter-clear" onclick="limparFiltroTodos()">Limpar</button>
+                    </div>
+                </div>
+                <div id="todos-grid" class="games-grid"></div>
+                <div id="loading-more">
+                    <div class="loading-spinner"></div>
+                    <p>Carregando mais arquivos...</p>
+                </div>
+                <div id="end-message">
+                    <p>🏁 Você chegou ao final dos arquivos!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo principal (Home) -->
+        <div id="conteudo-home">
+            <section id="games-section">
+                <div class="section-header">
+                    <h2 id="titulo-lista" data-i18n="games.all">Arquivos Disponíveis</h2>
+                    <div class="filter-container">
+                        <label for="filterCategoria">📂 Categoria:</label>
+                        <select class="filter-select" id="filterCategoria" onchange="filtrarPorCategoria()">
+                            <option value="todas">Todas as categorias</option>
+                        </select>
+                        <button class="filter-clear" onclick="limparFiltro()">Limpar</button>
+                    </div>
+                </div>
+                <div id="apk-grid" class="games-grid"></div>
+                
+                <!-- Botão Ver Todos -->
+                <div class="ver-todos-wrapper">
+                    <button class="btn-ver-todos" onclick="mostrarTodosArquivos()">
+                        📂 Ver todos os arquivos
+                        <span style="font-size:0.8rem; opacity:0.7;">({{totalArquivos}})</span>
+                    </button>
+                </div>
+            </section>
+        </div>
     </div>
 
     <!-- Share Modal -->
@@ -1435,12 +1978,13 @@
             
             <div class="form-group">
                 <label data-i18n="admin.category">Categoria</label>
-                <select id="apk-categoria" required>
+                <select id="apk-categoria" onchange="toggleUploadImagem(this.value)" required>
                     <option value="">Selecione uma categoria</option>
                     <option value="Design">🎨 Design</option>
                     <option value="Edição">✂️ Edição</option>
                     <option value="Áudio">🎵 Áudio</option>
                     <option value="Vídeo">🎬 Vídeo</option>
+                    <option value="Imagens">🖼️ Imagens</option>
                     <option value="Programação">💻 Programação</option>
                     <option value="Redes Sociais">📱 Redes Sociais</option>
                     <option value="SEO">📊 SEO</option>
@@ -1460,7 +2004,7 @@
                 <input type="url" id="apk-link" placeholder="https://..." required>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" id="upload-imagem-group">
                 <label data-i18n="admin.image">Imagem</label>
                 <div class="file-upload-area" onclick="document.getElementById('apk-imagem').click()">
                     <span id="file-name" data-i18n="admin.upload">Clique para fazer upload</span>
@@ -1520,23 +2064,21 @@
                 <h3>Ferramentas do Criador</h3>
                 <p data-i18n="footer.description">Sua fonte de ferramentas para criadores de conteúdo.</p>
                 <div class="social-links">
-                    <a href="#" aria-label="Facebook">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.8c4.56-.93 8-4.96 8-9.8z'/%3E%3C/svg%3E" alt="Facebook">
-                    </a>
-                    <a href="#" aria-label="Twitter">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M22 4.01c-.78.35-1.63.58-2.5.68.9-.54 1.59-1.39 1.92-2.41-.84.5-1.77.86-2.77 1.06-.8-.85-1.93-1.38-3.19-1.38-2.42 0-4.37 1.96-4.37 4.37 0 .34.04.68.11 1-3.63-.18-6.85-1.92-9-4.57-.38.65-.59 1.4-.59 2.21 0 1.52.77 2.86 1.95 3.64-.72-.02-1.4-.22-1.99-.55v.05c0 2.12 1.51 3.89 3.51 4.29-.37.1-.75.15-1.15.15-.28 0-.56-.03-.82-.08.56 1.75 2.18 3.02 4.11 3.06-1.51 1.18-3.41 1.88-5.48 1.88-.36 0-.71-.02-1.05-.06C3.76 20.5 6.07 21 8.52 21c8.03 0 12.42-6.66 12.42-12.42 0-.19 0-.38-.01-.57.85-.61 1.59-1.38 2.18-2.26l.01.01z'/%3E%3C/svg%3E" alt="Twitter">
-                    </a>
-                    <a href="#" aria-label="WhatsApp">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19.05 4.91C17.18 3.02 14.7 2 12 2 6.48 2 2 6.48 2 12c0 1.8.48 3.55 1.4 5.12L2.1 21.9l4.78-1.3c1.55.86 3.3 1.32 5.12 1.32 5.52 0 10-4.48 10-10 0-2.7-1.02-5.18-2.91-7.01l-.04-.03zm-7.05 16c-1.52 0-3.01-.44-4.29-1.26l-.31-.19-3.06.83.83-3.06-.19-.31C4.44 15.01 4 13.52 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.3-6.18c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12-.16.24-.62.77-.76.93-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.46-.39-.4-.54-.41-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.86.84-.86 2.05s.88 2.38 1 2.54c.12.16 1.73 2.64 4.19 3.63.59.23 1.04.37 1.4.48.59.17 1.13.14 1.55.09.48-.06 1.48-.6 1.69-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.46-.28z'/%3E%3C/svg%3E" alt="WhatsApp">
-                    </a>
+                    <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.8c4.56-.93 8-4.96 8-9.8z'/%3E%3C/svg%3E" alt="Facebook"></a>
+                    <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M22 4.01c-.78.35-1.63.58-2.5.68.9-.54 1.59-1.39 1.92-2.41-.84.5-1.77.86-2.77 1.06-.8-.85-1.93-1.38-3.19-1.38-2.42 0-4.37 1.96-4.37 4.37 0 .34.04.68.11 1-3.63-.18-6.85-1.92-9-4.57-.38.65-.59 1.4-.59 2.21 0 1.52.77 2.86 1.95 3.64-.72-.02-1.4-.22-1.99-.55v.05c0 2.12 1.51 3.89 3.51 4.29-.37.1-.75.15-1.15.15-.28 0-.56-.03-.82-.08.56 1.75 2.18 3.02 4.11 3.06-1.51 1.18-3.41 1.88-5.48 1.88-.36 0-.71-.02-1.05-.06C3.76 20.5 6.07 21 8.52 21c8.03 0 12.42-6.66 12.42-12.42 0-.19 0-.38-.01-.57.85-.61 1.59-1.38 2.18-2.26l.01.01z'/%3E%3C/svg%3E" alt="Twitter"></a>
+                    <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19.05 4.91C17.18 3.02 14.7 2 12 2 6.48 2 2 6.48 2 12c0 1.8.48 3.55 1.4 5.12L2.1 21.9l4.78-1.3c1.55.86 3.3 1.32 5.12 1.32 5.52 0 10-4.48 10-10 0-2.7-1.02-5.18-2.91-7.01l-.04-.03zm-7.05 16c-1.52 0-3.01-.44-4.29-1.26l-.31-.19-3.06.83.83-3.06-.19-.31C4.44 15.01 4 13.52 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.3-6.18c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12-.16.24-.62.77-.76.93-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.46-.39-.4-.54-.41-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.86.84-.86 2.05s.88 2.38 1 2.54c.12.16 1.73 2.64 4.19 3.63.59.23 1.04.37 1.4.48.59.17 1.13.14 1.55.09.48-.06 1.48-.6 1.69-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.46-.28z'/%3E%3C/svg%3E" alt="WhatsApp"></a>
+                </div>
+                <div class="footer-menu">
+                    <button class="footer-menu-item" onclick="mostrarRanking()">🏆 Ranking de Downloads</button>
+                    <button class="footer-menu-item" onclick="mostrarFAQ()">❓ Perguntas Frequentes (FAQ)</button>
                 </div>
             </div>
             <div class="footer-section">
                 <h3 data-i18n="footer.links">Links</h3>
                 <ul class="footer-links">
-                    <li><a href="#" data-i18n="footer.about">Sobre</a></li>
-                    <li><a href="#" data-i18n="footer.contact">Contato</a></li>
-                    <li><a href="#" data-i18n="footer.privacy">Privacidade</a></li>
+                    <li><a href="#" onclick="mostrarSobre(); return false;" data-i18n="footer.about">Sobre</a></li>
+                    <li><a href="#" onclick="window.open('https://www.instagram.com/dockaze_ff', '_blank'); return false;" data-i18n="footer.contact">Contato</a></li>
+                    <li><a href="#" onclick="mostrarPrivacidade(); return false;" data-i18n="footer.privacy">Privacidade</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -1552,7 +2094,7 @@
     </footer>
 
     <script>
-        // Configuração do Firebase - VOCÊ PRECISA SUBSTITUIR COM SEUS DADOS
+        // Configuração do Firebase
         const firebaseConfig = {
              apiKey: "AIzaSyAlhkQEMS0rj_Bg6hinIH8fQyDCS9IAFwU",
   authDomain: "dockaze-apks.firebaseapp.com",
@@ -1563,7 +2105,6 @@
   appId: "1:572390073078:web:c572401362cb97877d42d7"
 };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const apksRef = database.ref('apks');
@@ -1573,9 +2114,294 @@
         let adminLogado = false;
         let jogoAtualParaCompartilhar = null;
         let idiomaAtual = 'pt';
+        let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
+
+        // Variáveis para scroll infinito
+        const ARQUIVOS_POR_PAGINA = 8;
+        let paginaAtual = 1;
+        let todosArquivos = [];
+        let carregando = false;
+        let categoriaFiltro = 'todas';
 
         const ADMIN_USER = 'admin';
         const ADMIN_PASS = 'admin123';
+
+        // Função para ocultar/mostrar upload de imagem
+        function toggleUploadImagem(categoria) {
+            const uploadGroup = document.getElementById('upload-imagem-group');
+            const categoriasSemImagem = ['Áudio', 'Vídeo', 'Imagens'];
+            
+            if (categoriasSemImagem.includes(categoria)) {
+                uploadGroup.style.display = 'none';
+                document.getElementById('image-preview').style.display = 'none';
+            } else {
+                uploadGroup.style.display = 'block';
+            }
+        }
+
+        // Função para obter ícone da categoria
+        function getCategoriaIcon(categoria) {
+            const icons = {
+                'Áudio': '🎵',
+                'Vídeo': '🎬',
+                'Imagens': '🖼️',
+                'Design': '🎨',
+                'Edição': '✂️',
+                'Programação': '💻',
+                'Redes Sociais': '📱',
+                'SEO': '📊',
+                'Marketing': '📈',
+                'Ferramentas': '🛠️',
+                'Outros': '📁'
+            };
+            return icons[categoria] || '📄';
+        }
+
+        // Funções de navegação entre páginas
+        function mostrarSobre() {
+            document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-sobre').classList.remove('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarPrivacidade() {
+            document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarRanking() {
+            document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            atualizarRanking();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarFAQ() {
+            document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarTodosArquivos() {
+            document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            
+            paginaAtual = 1;
+            carregando = false;
+            document.getElementById('loading-more').style.display = 'none';
+            document.getElementById('end-message').style.display = 'none';
+            
+            atualizarFiltrosCategoriaTodos();
+            carregarPaginaTodos();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarFavoritos() {
+            document.querySelector('.favoritos-btn').style.background = 'rgba(139,92,246,0.2)';
+            document.querySelector('.favoritos-btn').style.borderColor = '#8B5CF6';
+            
+            const favoritosLista = apks.filter(apk => favoritos.includes(apk.id));
+            document.getElementById('titulo-lista').textContent = '❤️ Meus Favoritos';
+            
+            if (favoritosLista.length === 0) {
+                document.getElementById('apk-grid').innerHTML = 
+                    '<p style="text-align:center; padding:60px; color:var(--text-secondary);">Você ainda não tem favoritos. Clique no ❤️ de um arquivo para salvá-lo!</p>';
+            } else {
+                atualizarGrid(favoritosLista);
+            }
+            
+            document.getElementById('conteudo-home').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function voltarParaHome() {
+            document.getElementById('conteudo-home').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            
+            document.querySelector('.favoritos-btn').style.background = 'rgba(255,255,255,0.05)';
+            document.querySelector('.favoritos-btn').style.borderColor = 'rgba(139, 92, 246, 0.2)';
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            document.querySelector('.menu-item:first-child').classList.add('active');
+            document.getElementById('titulo-lista').textContent = traducoes[idiomaAtual]['games.all'];
+            filtrarPorCategoria();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Funções de scroll infinito
+        function carregarPaginaTodos() {
+            if (carregando) return;
+            
+            const filtrados = getArquivosFiltrados();
+            const total = filtrados.length;
+            
+            if (paginaAtual * ARQUIVOS_POR_PAGINA >= total && paginaAtual > 1) {
+                document.getElementById('end-message').style.display = 'block';
+                document.getElementById('loading-more').style.display = 'none';
+                return;
+            }
+            
+            if (total === 0) {
+                document.getElementById('todos-grid').innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Nenhum arquivo encontrado</p>';
+                return;
+            }
+            
+            carregando = true;
+            document.getElementById('loading-more').style.display = 'block';
+            
+            setTimeout(() => {
+                const inicio = (paginaAtual - 1) * ARQUIVOS_POR_PAGINA;
+                const fim = Math.min(inicio + ARQUIVOS_POR_PAGINA, total);
+                const proximos = filtrados.slice(inicio, fim);
+                
+                const grid = document.getElementById('todos-grid');
+                
+                if (paginaAtual === 1) {
+                    grid.innerHTML = '';
+                }
+                
+                proximos.forEach(apk => {
+                    grid.appendChild(criarCard(apk));
+                });
+                
+                paginaAtual++;
+                carregando = false;
+                document.getElementById('loading-more').style.display = 'none';
+                
+                if (paginaAtual * ARQUIVOS_POR_PAGINA >= total) {
+                    document.getElementById('end-message').style.display = 'block';
+                }
+            }, 300);
+        }
+
+        function getArquivosFiltrados() {
+            if (categoriaFiltro === 'todas') {
+                return [...todosArquivos];
+            }
+            return todosArquivos.filter(apk => apk.categoria === categoriaFiltro);
+        }
+
+        function criarCard(apk) {
+            const div = document.createElement('div');
+            const isFav = isFavorito(apk.id);
+            const isRecente = apk.data >= new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+            const categoriasSemImagem = ['Áudio', 'Vídeo', 'Imagens'];
+            const semImagem = categoriasSemImagem.includes(apk.categoria);
+            
+            div.className = `game-card ${semImagem ? 'sem-imagem' : ''}`;
+            
+            let imagemHtml = '';
+            if (semImagem) {
+                const icon = getCategoriaIcon(apk.categoria);
+                imagemHtml = `
+                    <div class="card-image">
+                        <div class="card-icon">${icon}</div>
+                    </div>
+                `;
+            } else {
+                imagemHtml = `
+                    <div class="card-image">
+                        <img src="${apk.imagem}" alt="${apk.nome}" onerror="this.src='https://via.placeholder.com/300x200?text=Erro'">
+                        ${apk.verificado ? '<div class="card-badge">✓ Verificado</div>' : ''}
+                        ${isRecente ? '<div class="card-badge recente">📅 Recente</div>' : ''}
+                    </div>
+                `;
+            }
+            
+            div.innerHTML = `
+                <button class="btn-favorito ${isFav ? 'favorito' : ''}" onclick="toggleFavorito('${apk.id}', this)" title="Favoritar">
+                    ${isFav ? '❤️' : '🤍'}
+                </button>
+                ${imagemHtml}
+                <div class="card-content">
+                    <h3>${apk.nome}</h3>
+                    <p class="card-description">${apk.descricao}</p>
+                    <div class="card-meta">
+                        <span class="version-badge">📦 ${apk.versao || '1.0.0'}</span>
+                        ${apk.categoria ? `<span class="categoria-badge">📂 ${apk.categoria}</span>` : ''}
+                        <span>📅 ${apk.data}</span>
+                        ${apk.downloads ? `<span>⬇️ ${(apk.downloads || 0).toLocaleString()}</span>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <a href="${apk.link}" target="_blank" class="btn-download">Baixar</a>
+                        <button class="btn-share" onclick="abrirShareModal('${apk.id}')">📤</button>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+
+        function filtrarTodos() {
+            categoriaFiltro = document.getElementById('filterCategoriaTodos').value;
+            paginaAtual = 1;
+            carregando = false;
+            document.getElementById('loading-more').style.display = 'none';
+            document.getElementById('end-message').style.display = 'none';
+            carregarPaginaTodos();
+        }
+
+        function limparFiltroTodos() {
+            document.getElementById('filterCategoriaTodos').value = 'todas';
+            categoriaFiltro = 'todas';
+            paginaAtual = 1;
+            carregando = false;
+            document.getElementById('loading-more').style.display = 'none';
+            document.getElementById('end-message').style.display = 'none';
+            carregarPaginaTodos();
+        }
+
+        function atualizarFiltrosCategoriaTodos() {
+            const select = document.getElementById('filterCategoriaTodos');
+            const categorias = new Set();
+            categorias.add('todas');
+            apks.forEach(apk => {
+                if (apk.categoria) categorias.add(apk.categoria);
+            });
+            
+            select.innerHTML = '';
+            categorias.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                if (cat === 'todas') {
+                    option.textContent = 'Todas as categorias';
+                } else {
+                    option.textContent = `📂 ${cat}`;
+                }
+                select.appendChild(option);
+            });
+        }
 
         // Mostrar loading
         function mostrarLoading() {
@@ -1593,6 +2419,17 @@
                 btn.style.display = 'flex';
             } else {
                 btn.style.display = 'none';
+            }
+            
+            // Scroll infinito na página "todos"
+            if (!document.getElementById('pagina-todos').classList.contains('hidden')) {
+                const loadingMore = document.getElementById('loading-more');
+                if (loadingMore) {
+                    const rect = loadingMore.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && !carregando) {
+                        carregarPaginaTodos();
+                    }
+                }
             }
         };
 
@@ -1766,7 +2603,6 @@
                 }
             });
             
-            // Atualizar título da lista baseado no modo atual
             if (document.querySelector('.menu-item.active').textContent.includes(traducoes[idioma]['menu.recent'])) {
                 document.getElementById('titulo-lista').textContent = traducoes[idioma]['games.recent'];
             } else {
@@ -1806,7 +2642,8 @@
                             link: "https://exemplo.com/canva-templates",
                             imagem: "https://via.placeholder.com/300x200?text=Design",
                             verificado: true,
-                            data: hoje
+                            data: hoje,
+                            downloads: 15234
                         },
                         {
                             nome: "CapCut Presets",
@@ -1816,7 +2653,8 @@
                             link: "https://exemplo.com/capcut-presets",
                             imagem: "https://via.placeholder.com/300x200?text=Edicao",
                             verificado: true,
-                            data: hoje
+                            data: hoje,
+                            downloads: 12890
                         },
                         {
                             nome: "Sample Packs Lo-fi",
@@ -1824,9 +2662,43 @@
                             categoria: "Áudio",
                             descricao: "Sample packs Lo-fi para produtores musicais. Qualidade profissional.",
                             link: "https://exemplo.com/lofi-samples",
-                            imagem: "https://via.placeholder.com/300x200?text=Audio",
+                            imagem: null,
                             verificado: true,
-                            data: hoje
+                            data: hoje,
+                            downloads: 8456
+                        },
+                        {
+                            nome: "Overlay Pack 4K",
+                            versao: "3.0.0",
+                            categoria: "Vídeo",
+                            descricao: "Pacote de overlays em 4K para edição de vídeos profissionais.",
+                            link: "https://exemplo.com/overlay-pack",
+                            imagem: null,
+                            verificado: true,
+                            data: "2026-02-20",
+                            downloads: 7234
+                        },
+                        {
+                            nome: "Scripts AutoClick",
+                            versao: "1.2.0",
+                            categoria: "Programação",
+                            descricao: "Scripts de automação para tarefas repetitivas. Economize tempo!",
+                            link: "https://exemplo.com/autoclick",
+                            imagem: "https://via.placeholder.com/300x200?text=Programacao",
+                            verificado: true,
+                            data: "2026-02-15",
+                            downloads: 5600
+                        },
+                        {
+                            nome: "Pack de Wallpapers 4K",
+                            versao: "2.0.0",
+                            categoria: "Imagens",
+                            descricao: "Coleção de wallpapers em 4K para desktop e celular.",
+                            link: "https://exemplo.com/wallpapers",
+                            imagem: null,
+                            verificado: true,
+                            data: "2026-02-10",
+                            downloads: 4300
                         }
                     ];
                     
@@ -1835,9 +2707,22 @@
                     });
                 }
                 
+                todosArquivos = [...apks];
                 atualizarContador();
                 atualizarFiltrosCategoria();
-                atualizarGrid(apks);
+                atualizarFiltrosCategoriaTodos();
+                atualizarBadgeFavoritos();
+                
+                // Mostrar apenas os primeiros 8 na home
+                const primeiros8 = apks.slice(0, 8);
+                atualizarGrid(primeiros8);
+                
+                // Atualizar texto do botão "Ver todos"
+                const btnVerTodos = document.querySelector('.btn-ver-todos');
+                if (btnVerTodos) {
+                    btnVerTodos.innerHTML = `📂 Ver todos os arquivos <span style="font-size:0.8rem; opacity:0.7;">(${apks.length})</span>`;
+                }
+                
                 if (adminLogado) atualizarTabelaAdmin();
                 esconderLoading();
             });
@@ -1845,6 +2730,10 @@
 
         function atualizarContador() {
             document.getElementById('total-apks').textContent = apks.length;
+        }
+
+        function atualizarBadgeFavoritos() {
+            document.getElementById('favoritos-badge').textContent = favoritos.length;
         }
 
         // Atualizar filtro de categorias
@@ -1869,20 +2758,44 @@
             });
         }
 
+        function atualizarFiltrosCategoriaTodos() {
+            const select = document.getElementById('filterCategoriaTodos');
+            const categorias = new Set();
+            categorias.add('todas');
+            apks.forEach(apk => {
+                if (apk.categoria) categorias.add(apk.categoria);
+            });
+            
+            select.innerHTML = '';
+            categorias.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                if (cat === 'todas') {
+                    option.textContent = 'Todas as categorias';
+                } else {
+                    option.textContent = `📂 ${cat}`;
+                }
+                select.appendChild(option);
+            });
+        }
+
         // Filtrar por categoria
         function filtrarPorCategoria() {
             const categoria = document.getElementById('filterCategoria').value;
             if (categoria === 'todas') {
-                atualizarGrid(apks);
+                const primeiros8 = apks.slice(0, 8);
+                atualizarGrid(primeiros8);
             } else {
                 const filtrados = apks.filter(apk => apk.categoria === categoria);
-                atualizarGrid(filtrados);
+                const primeiros8Filtrados = filtrados.slice(0, 8);
+                atualizarGrid(primeiros8Filtrados);
             }
         }
 
         function limparFiltro() {
             document.getElementById('filterCategoria').value = 'todas';
-            atualizarGrid(apks);
+            const primeiros8 = apks.slice(0, 8);
+            atualizarGrid(primeiros8);
         }
 
         // Mostrar todos os jogos
@@ -1894,7 +2807,11 @@
                 event.target.classList.add('active');
                 document.getElementById('titulo-lista').textContent = traducoes[idiomaAtual]['games.all'];
                 document.getElementById('filterCategoria').value = 'todas';
-                atualizarGrid(apks);
+                document.querySelector('.favoritos-btn').style.background = 'rgba(255,255,255,0.05)';
+                document.querySelector('.favoritos-btn').style.borderColor = 'rgba(139, 92, 246, 0.2)';
+                
+                const primeiros8 = apks.slice(0, 8);
+                atualizarGrid(primeiros8);
                 esconderLoading();
             }, 300);
         }
@@ -1908,18 +2825,20 @@
                 event.target.classList.add('active');
                 document.getElementById('titulo-lista').textContent = traducoes[idiomaAtual]['games.recent'];
                 document.getElementById('filterCategoria').value = 'todas';
+                document.querySelector('.favoritos-btn').style.background = 'rgba(255,255,255,0.05)';
+                document.querySelector('.favoritos-btn').style.borderColor = 'rgba(139, 92, 246, 0.2)';
                 
                 const seteDiasAtras = new Date();
                 seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
                 const dataLimite = seteDiasAtras.toISOString().split('T')[0];
                 
                 const recentes = apks.filter(apk => apk.data >= dataLimite);
+                const primeiros8Recentes = recentes.slice(0, 8);
                 
                 if (recentes.length === 0) {
-                    const grid = document.getElementById('apk-grid');
-                    grid.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Nenhum arquivo adicionado nos últimos 7 dias</p>';
+                    document.getElementById('apk-grid').innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Nenhum arquivo adicionado nos últimos 7 dias</p>';
                 } else {
-                    atualizarGrid(recentes);
+                    atualizarGrid(primeiros8Recentes);
                 }
                 esconderLoading();
             }, 300);
@@ -1954,7 +2873,8 @@
                 } else {
                     searchGrid.style.display = 'grid';
                     noResults.style.display = 'none';
-                    atualizarGrid(resultados, searchGrid);
+                    const primeiros8Resultados = resultados.slice(0, 8);
+                    atualizarGrid(primeiros8Resultados, searchGrid);
                 }
                 
                 searchSection.style.display = 'block';
@@ -1968,8 +2888,77 @@
             document.getElementById('searchResultsSection').style.display = 'none';
         }
 
+        // Favoritos
+        function toggleFavorito(id, elemento) {
+            const index = favoritos.indexOf(id);
+            if (index > -1) {
+                favoritos.splice(index, 1);
+            } else {
+                favoritos.push(id);
+            }
+            localStorage.setItem('favoritos', JSON.stringify(favoritos));
+            
+            if (elemento) {
+                elemento.classList.toggle('favorito');
+                elemento.textContent = favoritos.includes(id) ? '❤️' : '🤍';
+            }
+            
+            atualizarBadgeFavoritos();
+            mostrarToast(favoritos.includes(id) ? 'Adicionado aos favoritos! ❤️' : 'Removido dos favoritos! 💔');
+        }
+
+        function isFavorito(id) {
+            return favoritos.includes(id);
+        }
+
+        // Ranking
+        function atualizarRanking() {
+            const rankingList = document.getElementById('ranking-list');
+            const sorted = [...apks].sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+            const top10 = sorted.slice(0, 10);
+            
+            if (top10.length === 0) {
+                rankingList.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Nenhum arquivo disponível para ranking.</p>';
+                return;
+            }
+            
+            rankingList.innerHTML = top10.map((apk, index) => {
+                let classePosicao = '';
+                if (index === 0) classePosicao = 'ouro';
+                else if (index === 1) classePosicao = 'prata';
+                else if (index === 2) classePosicao = 'bronze';
+                
+                const medalha = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="ranking-posicao ${classePosicao}">${medalha}</div>
+                        <div class="ranking-info">
+                            <h4>${apk.nome}</h4>
+                            <p>📂 ${apk.categoria || 'Sem categoria'} • ⭐ ${apk.verificado ? 'Verificado' : 'Não verificado'}</p>
+                        </div>
+                        <div class="ranking-downloads">⬇️ ${(apk.downloads || 0).toLocaleString()} downloads</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // FAQ
+        function toggleFAQ(botao) {
+            const resposta = botao.nextElementSibling;
+            const isOpen = resposta.classList.contains('aberto');
+            
+            document.querySelectorAll('.faq-resposta').forEach(el => el.classList.remove('aberto'));
+            document.querySelectorAll('.faq-pergunta').forEach(el => el.classList.remove('aberto'));
+            
+            if (!isOpen) {
+                resposta.classList.add('aberto');
+                botao.classList.add('aberto');
+            }
+        }
+
         // Grid principal
-        function atualizarGrid(lista = apks, elemento = document.getElementById('apk-grid')) {
+        function atualizarGrid(lista = [], elemento = document.getElementById('apk-grid')) {
             if (lista.length === 0) {
                 elemento.innerHTML = '<p style="text-align:center; padding:40px; color:var(--text-secondary);">Nenhum arquivo disponível</p>';
                 return;
@@ -1978,17 +2967,37 @@
             const seteDiasAtras = new Date();
             seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
             const dataLimite = seteDiasAtras.toISOString().split('T')[0];
+            const categoriasSemImagem = ['Áudio', 'Vídeo', 'Imagens'];
 
             elemento.innerHTML = lista.map(apk => {
                 const isRecente = apk.data >= dataLimite;
+                const isFav = isFavorito(apk.id);
+                const semImagem = categoriasSemImagem.includes(apk.categoria);
+                
+                let imagemHtml = '';
+                if (semImagem) {
+                    const icon = getCategoriaIcon(apk.categoria);
+                    imagemHtml = `
+                        <div class="card-image" style="display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.1)); height:150px;">
+                            <div class="card-icon" style="font-size:4rem; opacity:0.7;">${icon}</div>
+                        </div>
+                    `;
+                } else {
+                    imagemHtml = `
+                        <div class="card-image">
+                            <img src="${apk.imagem || 'https://via.placeholder.com/300x200?text=Sem+Imagem'}" alt="${apk.nome}" onerror="this.src='https://via.placeholder.com/300x200?text=Erro'">
+                            ${apk.verificado ? '<div class="card-badge">✓ Verificado</div>' : ''}
+                            ${isRecente ? '<div class="card-badge recente">📅 Recente</div>' : ''}
+                        </div>
+                    `;
+                }
                 
                 return `
-                <div class="game-card">
-                    <div class="card-image">
-                        <img src="${apk.imagem}" alt="${apk.nome}" onerror="this.src='https://via.placeholder.com/300x200?text=Erro'">
-                        ${apk.verificado ? '<div class="card-badge">✓ Verificado</div>' : ''}
-                        ${isRecente ? '<div class="card-badge recente">📅 Recente</div>' : ''}
-                    </div>
+                <div class="game-card ${semImagem ? 'sem-imagem' : ''}">
+                    <button class="btn-favorito ${isFav ? 'favorito' : ''}" onclick="toggleFavorito('${apk.id}', this)" title="Favoritar">
+                        ${isFav ? '❤️' : '🤍'}
+                    </button>
+                    ${imagemHtml}
                     <div class="card-content">
                         <h3>${apk.nome}</h3>
                         <p class="card-description">${apk.descricao}</p>
@@ -1996,6 +3005,7 @@
                             <span class="version-badge">📦 ${apk.versao || '1.0.0'}</span>
                             ${apk.categoria ? `<span class="categoria-badge">📂 ${apk.categoria}</span>` : ''}
                             <span>📅 ${apk.data}</span>
+                            ${apk.downloads ? `<span>⬇️ ${(apk.downloads || 0).toLocaleString()}</span>` : ''}
                         </div>
                         <div class="card-actions">
                             <a href="${apk.link}" target="_blank" class="btn-download">
@@ -2096,7 +3106,9 @@
             const tbody = document.getElementById('tabela-apks-body');
             tbody.innerHTML = apks.map(apk => `
                 <tr>
-                    <td style="padding:12px; border-bottom:1px solid rgba(139,92,246,0.1);"><img src="${apk.imagem}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/40'"></td>
+                    <td style="padding:12px; border-bottom:1px solid rgba(139,92,246,0.1);">
+                        ${apk.imagem ? `<img src="${apk.imagem}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/40'">` : `<span style="font-size:1.5rem;">${getCategoriaIcon(apk.categoria)}</span>`}
+                    </td>
                     <td style="padding:12px; border-bottom:1px solid rgba(139,92,246,0.1);">${apk.nome}</td>
                     <td style="padding:12px; border-bottom:1px solid rgba(139,92,246,0.1);">${apk.versao || '1.0.0'}</td>
                     <td style="padding:12px; border-bottom:1px solid rgba(139,92,246,0.1);">${apk.categoria || '-'}</td>
@@ -2154,6 +3166,7 @@
             document.getElementById('apk-verificado').checked = true;
             document.getElementById('image-preview').style.display = 'none';
             document.getElementById('file-name').textContent = 'Clique para fazer upload';
+            document.getElementById('upload-imagem-group').style.display = 'block';
             abrirModal('apk-modal');
         }
 
@@ -2166,6 +3179,7 @@
             const link = document.getElementById('apk-link').value;
             const verificado = document.getElementById('apk-verificado').checked;
             const imagemInput = document.getElementById('apk-imagem');
+            const downloads = Math.floor(Math.random() * 5000) + 100;
 
             if (!nome || !descricao || !link || !categoria) {
                 alert('Preencha todos os campos obrigatórios!');
@@ -2175,7 +3189,10 @@
             mostrarLoading();
 
             let imagem = '';
-            if (imagemInput.files && imagemInput.files[0]) {
+            const categoriasSemImagem = ['Áudio', 'Vídeo', 'Imagens'];
+            
+            // Só tenta fazer upload se a categoria permitir imagem E tiver arquivo selecionado
+            if (!categoriasSemImagem.includes(categoria) && imagemInput.files && imagemInput.files[0]) {
                 imagem = await fazerUploadImagem(imagemInput.files[0]);
             }
 
@@ -2188,8 +3205,9 @@
                 descricao,
                 link,
                 verificado,
-                imagem: imagem || 'https://via.placeholder.com/300x200?text=Sem+Imagem',
-                data: hoje
+                imagem: imagem || null,
+                data: hoje,
+                downloads: downloads
             };
 
             if (id) {
@@ -2215,6 +3233,14 @@
                 document.getElementById('apk-descricao').value = apk.descricao;
                 document.getElementById('apk-link').value = apk.link;
                 document.getElementById('apk-verificado').checked = apk.verificado || false;
+                
+                // Gerenciar visibilidade do upload de imagem
+                const categoriasSemImagem = ['Áudio', 'Vídeo', 'Imagens'];
+                if (categoriasSemImagem.includes(apk.categoria)) {
+                    document.getElementById('upload-imagem-group').style.display = 'none';
+                } else {
+                    document.getElementById('upload-imagem-group').style.display = 'block';
+                }
                 
                 if (apk.imagem) {
                     const preview = document.getElementById('image-preview');
