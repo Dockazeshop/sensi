@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <script>
+    // Se o usuário não tiver a confirmação de login salva, joga ele de volta para a tela de login
+    if (localStorage.getItem("logado") !== "true") {
+        window.location.href = "index.html";
+    }
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ferramentas do Criador - Dockaze</title>
