@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sensi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        h2 { margin-bottom: 20px; color: #bb86fc; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background-color: #2d2d2d;
+            color: white;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #bb86fc;
+            border: none;
+            border-radius: 4px;
+            color: #121212;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #9965db; }
+        #mensagem { color: #ff6b6b; margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Área de Membros</h2>
+        <input type="email" id="email" placeholder="Seu e-mail de compra" required>
+        <input type="password" id="senha" placeholder="Sua senha recebida" required>
+        <button onclick="fazerLogin()">Entrar</button>
+        <div id="mensagem"></div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DO SEU FIREBASE
+        // Substitua pelo link correto do seu Firebase Realtime Database
+        const FIREBASE_URL = "https://dockaze-apks-default-rtdb.firebaseio.com"; 
+
+        async function fazerLogin() {
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const senhaInput = document.getElementById('senha').value;
+            const mensagemDiv = document.getElementById('mensagem');
+
+            mensagemDiv.innerText = "Verificando...";
+
+            if (!emailInput || !senhaInput) {
+                mensagemDiv.innerText = "Por favor, preencha todos os campos.";
+                return;
+            }
+
+            try {
+                // Busca a pasta de usuários liberados no seu Firebase
+                const response = await fetch(`${FIREBASE_URL}/usuarios_liberados.json`);
+                const usuarios = await response.json();
+
+                if (!usuarios) {
+                    mensagemDiv.innerText = "Nenhum usuário cadastrado no sistema ainda.";
+                    return;
+                }
+
+                let usuarioEncontrado = false;
+
+                // Percorre os registros do Firebase para validar e-mail e senha
+                for (let id in usuarios) {
+                    const user = usuarios[id];
+                    if (user.email.toLowerCase() === emailInput && user.senha === senhaInput) {
+                        usuarioEncontrado = true;
+                        
+                        // Salva temporariamente no navegador que o login foi feito com sucesso
+                        localStorage.setItem("logado", "true");
+                        localStorage.setItem("usuario_nome", user.nome);
+                        
+                        mensagemDiv.style.color = "#4caf50";
+                        mensagemDiv.innerText = "Login realizado! Redirecionando...";
+                        
+                        // Envia o usuário para a página principal (painel.html)
+                        setTimeout(() => {
+                            window.location.href = "painel.html";
+                        }, 1500);
+                        
+                        break;
+                    }
+                }
+
+                if (!usuarioEncontrado) {
+                    mensagemDiv.style.color = "#ff6b6b";
+                    mensagemDiv.innerText = "E-mail ou senha incorretos.";
+                }
+
+            } catch (error) {
+                console.error(error);
+                mensagemDiv.innerText = "Erro ao conectar com o banco de dados. Tente novamente.";
+            }
+        }
+    </script>
+</body>
+</html>
