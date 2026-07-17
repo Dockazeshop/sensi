@@ -3,108 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sensi</title>
+    <title>Área de Login - Portal do Cliente</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
             color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .login-container {
-            background-color: #1e1e1e;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            padding: 40px 30px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 
+                        0 0 50px rgba(138, 43, 226, 0.1);
             text-align: center;
+            transition: transform 0.3s ease;
         }
-        h2 { margin-bottom: 20px; color: #bb86fc; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border: 1px solid #333;
-            background-color: #2d2d2d;
-            color: white;
-            box-sizing: border-box;
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(138, 43, 226, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 
+                        0 0 60px rgba(138, 43, 226, 0.15);
         }
-        button {
+
+        .logo-area {
+            margin-bottom: 30px;
+        }
+
+        .logo-area h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-area p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group input {
             width: 100%;
-            padding: 12px;
-            background-color: #bb86fc;
+            padding: 14px 16px;
+            background: rgba(15, 15, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+            background: rgba(15, 15, 26, 0.9);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
             border: none;
-            border-radius: 4px;
-            color: #121212;
-            font-weight: bold;
+            border-radius: 10px;
+            color: #ffffff;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
             margin-top: 10px;
         }
-        button:hover { background-color: #9965db; }
-        #mensagem { color: #ff6b6b; margin-top: 15px; font-size: 14px; }
+
+        .btn-submit:hover {
+            opacity: 0.95;
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        #feedback-message {
+            margin-top: 20px;
+            font-size: 14px;
+            min-height: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .error-text { color: #f87171; }
+        .success-text { color: #4ade80; }
+        .loading-text { color: #38bdf8; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <h2>Área de Membros</h2>
-        <input type="email" id="email" placeholder="Seu e-mail de compra" required>
-        <input type="password" id="senha" placeholder="Sua senha recebida" required>
-        <button onclick="fazerLogin()">Entrar</button>
-        <div id="mensagem"></div>
+    <div class="login-card">
+        <div class="logo-area">
+            <h2>Área de Login</h2>
+            <p>Insira suas credenciais para acessar sua conta</p>
+        </div>
+
+        <div class="input-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="exemplo@email.com" autocomplete="email" required>
+        </div>
+
+        <div class="input-group">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" placeholder="••••••••" required>
+        </div>
+
+        <button class="btn-submit" id="btn-entrar" onclick="fazerLogin()">Acessar Conta</button>
+        
+        <div id="feedback-message"></div>
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SEU FIREBASE
-        // Substitua pelo link correto do seu Firebase Realtime Database
+        // CONFIGURAÇÃO DO FIREBASE (Copie e cole a URL do seu Realtime Database aqui)
         const FIREBASE_URL = "https://dockaze-apks-default-rtdb.firebaseio.com"; 
 
         async function fazerLogin() {
             const emailInput = document.getElementById('email').value.trim().toLowerCase();
-            const senhaInput = document.getElementById('senha').value;
-            const mensagemDiv = document.getElementById('mensagem');
+            const senhaInput = document.getElementById('senha').value.trim();
+            const feedback = document.getElementById('feedback-message');
+            const btn = document.getElementById('btn-entrar');
 
-            mensagemDiv.innerText = "Verificando...";
+            // Reseta classes e limpa mensagens anteriores
+            feedback.className = "";
+            feedback.innerText = "";
 
             if (!emailInput || !senhaInput) {
-                mensagemDiv.innerText = "Por favor, preencha todos os campos.";
+                feedback.className = "error-text";
+                feedback.innerText = "Por favor, preencha todos os campos.";
                 return;
             }
 
+            // Desativa o botão temporariamente para evitar cliques duplos
+            btn.disabled = true;
+            feedback.className = "loading-text";
+            feedback.innerText = "Verificando credenciais...";
+
             try {
-                // Busca a pasta de usuários liberados no seu Firebase
+                // Requisição direta para o seu Firebase
                 const response = await fetch(`${FIREBASE_URL}/usuarios_liberados.json`);
+                
+                if (!response.ok) {
+                    throw new Error("Erro na resposta do servidor");
+                }
+
                 const usuarios = await response.json();
 
                 if (!usuarios) {
-                    mensagemDiv.innerText = "Nenhum usuário cadastrado no sistema ainda.";
+                    feedback.className = "error-text";
+                    feedback.innerText = "Nenhum cadastro ativo localizado no sistema.";
+                    btn.disabled = false;
                     return;
                 }
 
                 let usuarioEncontrado = false;
 
-                // Percorre os registros do Firebase para validar e-mail e senha
+                // Loop para procurar se o e-mail e senha batem com os dados salvos
                 for (let id in usuarios) {
                     const user = usuarios[id];
-                    if (user.email.toLowerCase() === emailInput && user.senha === senhaInput) {
+                    
+                    if (user.email && user.senha && user.email.toLowerCase() === emailInput && user.senha === senhaInput) {
                         usuarioEncontrado = true;
                         
-                        // Salva temporariamente no navegador que o login foi feito com sucesso
+                        // Salva o estado de login no navegador do cliente
                         localStorage.setItem("logado", "true");
-                        localStorage.setItem("usuario_nome", user.nome);
+                        localStorage.setItem("usuario_nome", user.nome || "Cliente");
                         
-                        mensagemDiv.style.color = "#4caf50";
-                        mensagemDiv.innerText = "Login realizado! Redirecionando...";
+                        feedback.className = "success-text";
+                        feedback.innerText = "Sucesso! Redirecionando para o painel...";
                         
-                        // Envia o usuário para a página principal (painel.html)
+                        // Redireciona para o arquivo painel.html após 1.5 segundos
                         setTimeout(() => {
                             window.location.href = "painel.html";
                         }, 1500);
@@ -114,13 +224,16 @@
                 }
 
                 if (!usuarioEncontrado) {
-                    mensagemDiv.style.color = "#ff6b6b";
-                    mensagemDiv.innerText = "E-mail ou senha incorretos.";
+                    feedback.className = "error-text";
+                    feedback.innerText = "E-mail ou senha inválidos.";
+                    btn.disabled = false;
                 }
 
             } catch (error) {
-                console.error(error);
-                mensagemDiv.innerText = "Erro ao conectar com o banco de dados. Tente novamente.";
+                console.error("Erro na autenticação:", error);
+                feedback.className = "error-text";
+                feedback.innerText = "Ocorreu um erro ao conectar. Tente novamente mais tarde.";
+                btn.disabled = false;
             }
         }
     </script>
