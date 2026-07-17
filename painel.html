@@ -46,7 +46,6 @@
             overflow-x: hidden;
         }
 
-        /* Fundo com gradiente e grid sutil */
         body::before {
             content: '';
             position: fixed;
@@ -271,6 +270,8 @@
             display: flex;
             gap: 6px;
             flex-wrap: nowrap;
+            overflow-x: auto;
+            max-width: 95%;
         }
 
         .menu-item {
@@ -803,7 +804,6 @@
             transform: rotate(8deg);
         }
 
-        /* ===== BOTÃO VER TODOS ===== */
         .ver-todos-wrapper {
             text-align: center;
             margin: 40px 0 20px;
@@ -829,6 +829,250 @@
         .btn-ver-todos:hover {
             transform: translateY(-4px) scale(1.02);
             box-shadow: 0 8px 40px rgba(0, 229, 255, 0.3);
+        }
+
+        /* ===== FERRAMENTAS DE CRIAÇÃO ===== */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            animation: fadeUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .tool-card:nth-child(1) { animation-delay: 0.05s; }
+        .tool-card:nth-child(2) { animation-delay: 0.10s; }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 229, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-card .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: var(--cyan);
+        }
+
+        .tool-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tool-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        /* ===== GERADOR DE HASHTAGS ===== */
+        .hashtag-generator {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 32px;
+            margin-top: 24px;
+        }
+
+        .hashtag-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 20px 0 28px;
+        }
+
+        .hashtag-cat-btn {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .hashtag-cat-btn:hover {
+            background: rgba(0, 229, 255, 0.06);
+            border-color: rgba(0, 229, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .hashtag-cat-btn.active {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .hashtag-result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 120px;
+            border: 1px solid var(--border-glass);
+            position: relative;
+        }
+
+        .hashtag-result .hashtag-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 2;
+            word-break: break-word;
+        }
+
+        .hashtag-result .hashtag-text .tag {
+            color: var(--cyan);
+            font-weight: 500;
+        }
+
+        .hashtag-result .copy-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 8px 16px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            color: var(--cyan);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .hashtag-result .copy-btn:hover {
+            background: rgba(0, 229, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        /* ===== GERADOR DE BIO ===== */
+        .bio-generator {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 32px;
+            margin-top: 24px;
+        }
+
+        .bio-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 20px 0 28px;
+        }
+
+        .bio-template-btn {
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .bio-template-btn:hover {
+            background: rgba(0, 229, 255, 0.06);
+            border-color: rgba(0, 229, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .bio-template-btn.active {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .bio-result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 140px;
+            border: 1px solid var(--border-glass);
+            position: relative;
+        }
+
+        .bio-result .bio-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .bio-result .bio-text .highlight {
+            color: var(--cyan);
+            font-weight: 500;
+            background: rgba(0, 229, 255, 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px dashed rgba(0, 229, 255, 0.15);
+        }
+
+        .bio-result .copy-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 8px 16px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            color: var(--cyan);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .bio-result .copy-btn:hover {
+            background: rgba(0, 229, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .bio-result .bio-placeholders {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px dashed var(--border-glass);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .bio-result .bio-placeholders span {
+            color: var(--cyan);
+            font-weight: 500;
         }
 
         /* ===== PÁGINAS INTERNAS ===== */
@@ -1490,16 +1734,9 @@
             opacity: 0.6;
         }
 
-        /* ===== ANIMAÇÕES ===== */
         @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ===== RESPONSIVIDADE ===== */
@@ -1508,123 +1745,58 @@
                 grid-template-columns: 1fr;
                 text-align: center;
             }
-
-            .hero-text p {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .hero-buttons {
-                justify-content: center;
-            }
-
-            .hero-stats {
-                justify-content: center;
-            }
-
-            .hero-illustration .glow-orb {
-                width: 200px;
-                height: 200px;
-            }
-
-            .hero-illustration .glow-orb i {
-                font-size: 5rem;
-            }
+            .hero-text p { margin-left: auto; margin-right: auto; }
+            .hero-buttons { justify-content: center; }
+            .hero-stats { justify-content: center; }
+            .hero-illustration .glow-orb { width: 200px; height: 200px; }
+            .hero-illustration .glow-orb i { font-size: 5rem; }
         }
 
         @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 12px;
+            .nav-container { flex-direction: column; gap: 12px; }
+            .search-container { max-width: 100%; width: 100%; }
+            .bottom-menu { padding: 6px 10px; gap: 4px; bottom: 16px; border-radius: 40px; overflow-x: auto; max-width: 95%; }
+            .menu-item { padding: 6px 14px; font-size: 0.75rem; }
+            .menu-item span { display: none; }
+            .hero { min-height: 60vh; padding: 100px 16px 60px; }
+            .hero-text h1 { font-size: 2.2rem; }
+            .hero-text p { font-size: 0.95rem; }
+            .hero-stats { gap: 24px; flex-wrap: wrap; }
+            .stat-number { font-size: 1.4rem; }
+            .page-content { padding: 24px; }
+            .modal-content { padding: 24px; margin: 12px; }
+            .share-buttons { grid-template-columns: 1fr 1fr; }
+            .hashtag-categories {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
-
-            .search-container {
-                max-width: 100%;
-                width: 100%;
+            .bio-templates {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             }
-
-            .bottom-menu {
-                padding: 6px 10px;
-                gap: 4px;
-                bottom: 16px;
-                border-radius: 40px;
-                overflow-x: auto;
-                max-width: 95%;
-            }
-
-            .menu-item {
-                padding: 6px 14px;
-                font-size: 0.75rem;
-            }
-
-            .menu-item span {
-                display: none;
-            }
-
-            .hero {
-                min-height: 60vh;
-                padding: 100px 16px 60px;
-            }
-
-            .hero-text h1 {
-                font-size: 2.2rem;
-            }
-
-            .hero-text p {
-                font-size: 0.95rem;
-            }
-
-            .hero-stats {
-                gap: 24px;
-                flex-wrap: wrap;
-            }
-
-            .stat-number {
-                font-size: 1.4rem;
-            }
-
-            .page-content {
-                padding: 24px;
-            }
-
-            .modal-content {
-                padding: 24px;
-                margin: 12px;
-            }
-
-            .share-buttons {
-                grid-template-columns: 1fr 1fr;
+            .tools-grid {
+                grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 480px) {
-            .btn-primary, .btn-secondary {
-                padding: 12px 24px;
-                font-size: 0.9rem;
+            .btn-primary, .btn-secondary { padding: 12px 24px; font-size: 0.9rem; width: 100%; text-align: center; }
+            .hero-buttons { flex-direction: column; width: 100%; }
+            .hero-illustration .glow-orb { width: 160px; height: 160px; }
+            .hero-illustration .glow-orb i { font-size: 4rem; }
+            .card-content { padding: 14px 16px 16px; }
+            .admin-table { min-width: 500px; }
+            .hashtag-generator, .bio-generator { padding: 20px; }
+            .hashtag-categories {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            .bio-templates {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .bio-result .copy-btn,
+            .hashtag-result .copy-btn {
+                position: static;
+                margin-top: 12px;
                 width: 100%;
                 text-align: center;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .hero-illustration .glow-orb {
-                width: 160px;
-                height: 160px;
-            }
-
-            .hero-illustration .glow-orb i {
-                font-size: 4rem;
-            }
-
-            .card-content {
-                padding: 14px 16px 16px;
-            }
-
-            .admin-table {
-                min-width: 500px;
             }
         }
     </style>
@@ -1641,7 +1813,7 @@
                 <h1>Ferramentas do <span>Criador</span></h1>
                 <p>Arquivos, presets, templates e recursos essenciais para impulsionar sua criação de conteúdo.</p>
                 <div class="hero-buttons">
-                    <button class="btn-primary" onclick="document.getElementById('games-section').scrollIntoView({behavior:'smooth'})">
+                    <button class="btn-primary" onclick="document.getElementById('tools-section').scrollIntoView({behavior:'smooth'})">
                         <i class="fas fa-compass"></i> Explorar
                     </button>
                     <button class="btn-secondary" onclick="mostrarRanking()">
@@ -1692,11 +1864,11 @@
 
     <!-- ===== BOTTOM MENU ===== -->
     <div class="bottom-menu">
-        <button class="menu-item active" onclick="mostrarTodos()">
-            <i class="fas fa-th"></i> <span>Todos</span>
+        <button class="menu-item" onclick="mostrarTodos()">
+            <i class="fas fa-th"></i> <span>Arquivos</span>
         </button>
-        <button class="menu-item" onclick="mostrarRecentes()">
-            <i class="fas fa-clock"></i> <span>Recentes</span>
+        <button class="menu-item active" onclick="mostrarFerramentas()">
+            <i class="fas fa-wand-magic-sparkles"></i> <span>Ferramentas</span>
         </button>
         <button class="menu-item linktree" onclick="window.open('https://linktr.ee/DOCKAZE', '_blank')">
             <i class="fas fa-link"></i> Linktree
@@ -1810,8 +1982,107 @@
             </div>
         </div>
 
-        <!-- HOME -->
-        <div id="conteudo-home">
+        <!-- PÁGINA DE FERRAMENTAS (Hashtags + Bio) -->
+        <div id="pagina-ferramentas">
+            <!-- Seção de Ferramentas -->
+            <section id="tools-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-wand-magic-sparkles" style="color:var(--cyan);margin-right:10px;"></i>Ferramentas para Criadores</h2>
+                </div>
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="mostrarGeradorHashtags()">
+                        <div class="tool-icon"><i class="fas fa-hashtag"></i></div>
+                        <h3>Gerador de Hashtags</h3>
+                        <p>Hashtags reais que funcionam para viralizar seu conteúdo</p>
+                    </div>
+                    <div class="tool-card" onclick="mostrarGeradorBio()">
+                        <div class="tool-icon"><i class="fas fa-user-pen"></i></div>
+                        <h3>Gerador de Bio</h3>
+                        <p>Modelos de bio prontos para TikTok, Instagram e mais</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gerador de Hashtags -->
+            <div id="gerador-hashtags" class="hidden">
+                <button class="page-back" onclick="voltarParaFerramentas()"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <div class="page-content">
+                    <h2 class="page-title"><i class="fas fa-hashtag" style="color:var(--cyan);margin-right:12px;"></i>Gerador de Hashtags</h2>
+                    <p>Escolha o tipo de conteúdo e copie as hashtags que mais funcionam.</p>
+                    
+                    <div class="hashtag-generator">
+                        <label style="color:var(--text-secondary);font-size:0.95rem;font-weight:500;">Selecione o nicho do seu conteúdo:</label>
+                        <div class="hashtag-categories" id="hashtag-categories">
+                            <button class="hashtag-cat-btn active" onclick="gerarHashtags('jogos')">🎮 Jogos</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('musica')">🎵 Música</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('humor')">😂 Humor</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('tutorial')">📚 Tutoriais</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('dança')">💃 Dança</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('cozinha')">🍳 Cozinha</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('viagem')">✈️ Viagem</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('fitness')">💪 Fitness</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('moda')">👗 Moda</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('tecnologia')">💻 Tecnologia</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('educacao')">📖 Educação</button>
+                            <button class="hashtag-cat-btn" onclick="gerarHashtags('pets')">🐾 Pets</button>
+                        </div>
+
+                        <div class="hashtag-result" id="hashtag-result">
+                            <button class="copy-btn" onclick="copiarHashtags()"><i class="fas fa-copy"></i> Copiar</button>
+                            <div class="hashtag-text" id="hashtag-text">
+                                <span class="tag">#gaming</span> <span class="tag">#gamer</span> <span class="tag">#gameplay</span> <span class="tag">#games</span> <span class="tag">#videogames</span> <span class="tag">#twitch</span> <span class="tag">#youtube</span> <span class="tag">#streamer</span> <span class="tag">#esports</span> <span class="tag">#fortnite</span> <span class="tag">#freefire</span> <span class="tag">#cod</span> <span class="tag">#valorant</span> <span class="tag">#lol</span> <span class="tag">#minecraft</span> <span class="tag">#playstation</span> <span class="tag">#xbox</span> <span class="tag">#nintendo</span> <span class="tag">#pcgaming</span> <span class="tag">#mobilegaming</span> <span class="tag">#gamespot</span> <span class="tag">#ign</span> <span class="tag">#gamingcommunity</span> <span class="tag">#gameon</span> <span class="tag">#levelup</span> <span class="tag">#gameover</span> <span class="tag">#highlights</span> <span class="tag">#clutch</span> <span class="tag">#win</span> <span class="tag">#gaminglife</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gerador de Bio -->
+            <div id="gerador-bio" class="hidden">
+                <button class="page-back" onclick="voltarParaFerramentas()"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <div class="page-content">
+                    <h2 class="page-title"><i class="fas fa-user-pen" style="color:var(--cyan);margin-right:12px;"></i>Gerador de Bio</h2>
+                    <p>Escolha um modelo e personalize com seu nome e estilo.</p>
+                    
+                    <div class="bio-generator">
+                        <label style="color:var(--text-secondary);font-size:0.95rem;font-weight:500;">Escolha o estilo da sua bio:</label>
+                        <div class="bio-templates" id="bio-templates">
+                            <button class="bio-template-btn active" onclick="gerarBio('gamer')">🎮 Gamer</button>
+                            <button class="bio-template-btn" onclick="gerarBio('musico')">🎵 Músico</button>
+                            <button class="bio-template-btn" onclick="gerarBio('humor')">😂 Humor</button>
+                            <button class="bio-template-btn" onclick="gerarBio('influencer')">📱 Influencer</button>
+                            <button class="bio-template-btn" onclick="gerarBio('profissional')">💼 Profissional</button>
+                            <button class="bio-template-btn" onclick="gerarBio('fitness')">💪 Fitness</button>
+                            <button class="bio-template-btn" onclick="gerarBio('viagem')">✈️ Viagem</button>
+                            <button class="bio-template-btn" onclick="gerarBio('cozinha')">🍳 Cozinha</button>
+                            <button class="bio-template-btn" onclick="gerarBio('tecnologia')">💻 Tecnologia</button>
+                            <button class="bio-template-btn" onclick="gerarBio('estudante')">📚 Estudante</button>
+                        </div>
+
+                        <div class="bio-result" id="bio-result">
+                            <button class="copy-btn" onclick="copiarBio()"><i class="fas fa-copy"></i> Copiar</button>
+                            <div class="bio-text" id="bio-text">
+🚀 <span class="highlight">Seu Nome</span> | Gamer 🎮
+
+📌 Criador de conteúdo • Streamer • Gamer profissional
+
+⬇️ Segue aí pra não perder nada!
+📩 Parcerias: <span class="highlight">seu.email@dominio.com</span>
+
+🎯 Meta: 10k até o fim do ano
+🏆 @<span class="highlight">seu_perfil</span> no TikTok
+                            </div>
+                            <div class="bio-placeholders">
+                                🔄 Substitua <span>Seu Nome</span>, <span>seu.email@dominio.com</span> e <span>seu_perfil</span> pelos seus dados.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOME (Arquivos) -->
+        <div id="conteudo-home" class="hidden">
             <section id="games-section">
                 <div class="section-header">
                     <h2 id="titulo-lista"><i class="fas fa-layer-group" style="color:var(--cyan);margin-right:10px;"></i>Arquivos Disponíveis</h2>
@@ -1996,8 +2267,8 @@
 
     <script>
         // ============================================================
-        // TODA A LÓGICA ORIGINAL FOI MANTIDA INTEGRALMENTE
-        // Apenas o visual foi atualizado
+        // TODA A LÓGICA ORIGINAL FOI MANTIDA
+        // NOVAS FUNÇÕES: GERADOR DE HASHTAGS E BIO
         // ============================================================
 
         const firebaseConfig = {
@@ -2029,6 +2300,240 @@
         const ADMIN_USER = 'admin';
         const ADMIN_PASS = 'admin123';
 
+        // ===== DADOS DAS HASHTAGS POR CATEGORIA =====
+        const hashtagsData = {
+            jogos: ['#gaming', '#gamer', '#gameplay', '#games', '#videogames', '#twitch', '#youtube', '#streamer', '#esports', '#fortnite', '#freefire', '#cod', '#valorant', '#lol', '#minecraft', '#playstation', '#xbox', '#nintendo', '#pcgaming', '#mobilegaming', '#gamespot', '#ign', '#gamingcommunity', '#gameon', '#levelup', '#gameover', '#highlights', '#clutch', '#win', '#gaminglife'],
+            musica: ['#music', '#musica', '#musician', '#singer', '#songwriter', '#producer', '#beatmaker', '#studio', '#recording', '#newmusic', '#musicvideo', '#viral', '#trending', '#soundcloud', '#spotify', '#appleMusic', '#deezer', '#youtubeMusic', '#musiclover', '#musiclife', '#instamusic', '#musicartist', '#hiphop', '#rap', '#pop', '#rock', '#edm', '#lofi', '#jazz', '#classical'],
+            humor: ['#humor', '#comedy', '#funny', '#memes', '#risada', '#humorbrasil', '#comedian', '#standup', '#sketch', '#comedyvideo', '#laugh', '#fun', '#diversao', '#zoeira', '#humornegro', '#piada', '#trolagem', '#memesbr', '#humorista', '#comedia', '#risos', '#engracado', '#bestmemes', '#dankmemes', '#funnyvideos', '#lol', '#haha', '#comedyclub', '#improv', '#satire'],
+            tutorial: ['#tutorial', '#howto', '#diy', '#tips', '#tricks', '#aprenda', '#ensinando', '#passoapasso', '#dica', '#educacao', '#conhecimento', '#aprender', '#curso', '#aula', '#professor', '#estudo', '#onlinelearning', '#tutoriais', '#ensinamento', '#saber', '#desenvolvimento', '#crescimento', '#autoaprendizagem', '#mentoria', '#guia', '#manual', '#instrucao', '#demonstracao', '#pratico', '#facil'],
+            dança: ['#dance', '#danca', '#dancer', '#dancelife', '#choreography', '#dancevideo', '#tiktokdance', '#dancechallenge', '#ballerina', '#hiphopdance', '#streetdance', '#dancecover', '#dancemoves', '#dancetutorial', '#danceroutine', '#danceclass', '#dancefitness', '#zumba', '#salsa', '#forro', '#kpopdance', '#jazzdance', '#contemporarydance', '#dancestudio', '#danceworld', '#dancecommunity', '#danceeveryday', '#dancefit', '#danceparty', '#dancelove'],
+            cozinha: ['#cozinha', '#cooking', '#food', '#receitas', '#chef', '#culinaria', '#comida', '#gastronomia', '#recipes', '#foodie', '#delicious', '#homemade', '#cozinhar', '#pratochef', '#alimentacao', '#saudavel', '#cozinhosaudavel', '#foodporn', '#instafood', '#yummy', '#taste', '#flavor', '#cook', '#kitchen', '#foodlover', '#easyrecipes', '#quickmeals', '#dinner', '#lunch', '#breakfast'],
+            viagem: ['#viagem', '#travel', '#trip', '#wanderlust', '#explore', '#adventure', '#travelgram', '#nature', '#beach', '#mountain', '#city', '#vacation', '#holiday', '#roadtrip', '#backpacking', '#travelphotography', '#travelblogger', '#traveling', '#destino', '#mochilao', '#viajante', '#mundo', '#culture', '#landscape', '#sunset', '#ocean', '#forest', '#desert', '#urban', '#explorer'],
+            fitness: ['#fitness', '#gym', '#workout', '#treino', '#musculacao', '#crossfit', '#cardio', '#health', '#saude', '#exercicio', '#fit', '#bodybuilding', '#fitnessmotivation', '#fitfam', '#gains', '#training', '#fitnessmodel', '#physique', '#nutrition', '#dieta', '#emagrecimento', '#shape', '#strong', '#power', '#endurance', '#wellness', '#active', '#fitnesslife', '#gymlife', '#motivation'],
+            moda: ['#moda', '#fashion', '#style', '#outfit', '#look', '#trendy', '#streetwear', '#fashionista', '#blogger', '#estilo', '#tendencia', '#clothing', '#design', '#luxury', '#vintage', '#modern', '#ootd', '#inspo', '#fashionweek', '#model', '#runway', '#brand', '#shopping', '#beauty', '#makeup', '#accessories', '#shoes', '#bag', '#jewelry', '#fashiongram'],
+            tecnologia: ['#tecnologia', '#tech', '#technology', '#innovation', '#gadgets', '#smartphone', '#computador', '#programacao', '#dev', '#coder', '#software', '#hardware', '#ai', '#iot', '#cybersecurity', '#blockchain', '#web3', '#metaverso', '#startup', '#empreendedorismo', '#digital', '#future', '#techworld', '#geek', '#nerd', '#hacker', '#opensource', '#linux', '#windows', '#mac'],
+            educacao: ['#educacao', '#education', '#study', '#student', '#professor', '#escola', '#faculdade', '#conhecimento', '#aprender', '#ensino', '#cultura', '#ciencia', '#historia', '#matematica', '#portugues', '#ingles', '#filosofia', '#sociologia', '#quimica', '#fisica', '#biologia', '#geografia', '#arte', '#literatura', '#redacao', '#enem', '#vestibular', '#ead', '#onlinecourse', '#learning'],
+            pets: ['#pets', '#dogs', '#cats', '#animais', '#petshop', '#doglife', '#catlife', '#instapet', '#animal', '#petstagram', '#cachorro', '#gato', '#hamster', '#passaro', '#peixe', '#reptil', '#horse', '#farm', '#wildlife', '#natureza', '#petcare', '#adoption', '#rescue', '#lovepets', '#puppy', '#kitten', '#petlover', '#animallovers', '#petworld', '#furry']
+        };
+
+        // ===== DADOS DAS BIOS POR ESTILO =====
+        const bioData = {
+            gamer: `🚀 [Seu Nome] | Gamer 🎮
+
+📌 Criador de conteúdo • Streamer • Gamer profissional
+
+⬇️ Segue aí pra não perder nada!
+📩 Parcerias: [seu.email@dominio.com]
+
+🎯 Meta: 10k até o fim do ano
+🏆 @[seu_perfil] no TikTok`,
+            musico: `🎵 [Seu Nome] | Músico
+
+🎹 Produtor • Cantor • Compositor
+📀 Novas músicas em breve!
+
+⬇️ Escute agora no link abaixo
+📩 Contato: [seu.email@dominio.com]
+
+🎯 Meta: 100k streams
+🎤 @[seu_perfil] no TikTok`,
+            humor: `😂 [Seu Nome] | Humorista
+
+🎭 Comediante • Criador de memes • Ator
+📹 Vídeos novos toda semana!
+
+⬇️ Dá uma risada comigo
+📩 Parcerias: [seu.email@dominio.com]
+
+🎯 Meta: viralizar sempre
+🎬 @[seu_perfil] no TikTok`,
+            influencer: `✨ [Seu Nome] | Influencer
+
+📱 Criadora de conteúdo • Lifestyle • Beleza
+💄 Dicas de moda e maquiagem
+
+⬇️ Me acompanha pra não perder
+📩 Collabs: [seu.email@dominio.com]
+
+🎯 Meta: 500k no TikTok
+💫 @[seu_perfil] no TikTok`,
+            profissional: `💼 [Seu Nome] | [Sua Profissão]
+
+📊 Especialista em [sua área]
+📈 Ajudando empresas a crescerem
+
+⬇️ Saiba mais no link abaixo
+📩 Contato: [seu.email@dominio.com]
+
+🎯 Meta: impactar 1M de pessoas
+🚀 @[seu_perfil] no LinkedIn`,
+            fitness: `💪 [Seu Nome] | Fitness
+
+🏋️ Personal Trainer • Nutrição • Bem-estar
+🥗 Transforme seu corpo e mente
+
+⬇️ Dicas diárias no feed
+📩 Consultoria: [seu.email@dominio.com]
+
+🎯 Meta: 100k seguidores
+🏃 @[seu_perfil] no TikTok`,
+            viagem: `✈️ [Seu Nome] | Viajante
+
+🌍 Explorando o mundo • Cultura • Aventura
+📸 30 países e contando...
+
+⬇️ Me siga nessa jornada
+📩 Parcerias: [seu.email@dominio.com]
+
+🎯 Meta: visitar 50 países
+🌎 @[seu_perfil] no TikTok`,
+            cozinha: `🍳 [Seu Nome] | Cozinheira
+
+👩‍🍳 Receitas fáceis • Dicas culinárias
+🥘 Comida que aquece o coração
+
+⬇️ Novo vídeo toda semana
+📩 Contato: [seu.email@dominio.com]
+
+🎯 Meta: 1M de views
+🍽️ @[seu_perfil] no TikTok`,
+            tecnologia: `💻 [Seu Nome] | Tech
+
+🔧 Dev • Tech Review • Inovação
+📱 Testando os melhores gadgets
+
+⬇️ Fique por dentro da tecnologia
+📩 Contato: [seu.email@dominio.com]
+
+🎯 Meta: 100k inscritos
+🤖 @[seu_perfil] no TikTok`,
+            estudante: `📚 [Seu Nome] | Estudante
+
+🎓 Graduando em [seu curso]
+📝 Dicas de estudo • Rotina acadêmica
+
+⬇️ Acompanhe minha jornada
+📩 Contato: [seu.email@dominio.com]
+
+🎯 Meta: me formar com honras
+📖 @[seu_perfil] no TikTok`
+        };
+
+        // ===== FUNÇÕES DE NAVEGAÇÃO DAS FERRAMENTAS =====
+        function mostrarFerramentas() {
+            document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ferramentas').classList.remove('hidden');
+            document.getElementById('pagina-sobre').classList.add('hidden');
+            document.getElementById('pagina-privacidade').classList.add('hidden');
+            document.getElementById('pagina-ranking').classList.add('hidden');
+            document.getElementById('pagina-faq').classList.add('hidden');
+            document.getElementById('pagina-todos').classList.add('hidden');
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            document.querySelector('.menu-item:nth-child(2)').classList.add('active');
+            
+            // Garantir que os geradores estão escondidos e a página de ferramentas visível
+            document.getElementById('gerador-hashtags').classList.add('hidden');
+            document.getElementById('gerador-bio').classList.add('hidden');
+            document.getElementById('tools-section').classList.remove('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function voltarParaFerramentas() {
+            document.getElementById('gerador-hashtags').classList.add('hidden');
+            document.getElementById('gerador-bio').classList.add('hidden');
+            document.getElementById('tools-section').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarGeradorHashtags() {
+            document.getElementById('tools-section').classList.add('hidden');
+            document.getElementById('gerador-hashtags').classList.remove('hidden');
+            document.getElementById('gerador-bio').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarGeradorBio() {
+            document.getElementById('tools-section').classList.add('hidden');
+            document.getElementById('gerador-bio').classList.remove('hidden');
+            document.getElementById('gerador-hashtags').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== GERADOR DE HASHTAGS =====
+        function gerarHashtags(categoria) {
+            // Atualizar botões ativos
+            document.querySelectorAll('.hashtag-cat-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(categoria)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const hashtags = hashtagsData[categoria] || hashtagsData.jogos;
+            const container = document.getElementById('hashtag-text');
+            container.innerHTML = hashtags.map(tag => `<span class="tag">${tag}</span>`).join(' ');
+            
+            // Salvar para copiar
+            container.dataset.text = hashtags.join(' ');
+        }
+
+        function copiarHashtags() {
+            const text = document.getElementById('hashtag-text').dataset.text || 
+                        document.getElementById('hashtag-text').textContent.replace(/\s+/g, ' ').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                mostrarToast('📋 Hashtags copiadas!');
+            }).catch(() => {
+                // Fallback
+                const range = document.createRange();
+                const selection = window.getSelection();
+                const el = document.getElementById('hashtag-text');
+                range.selectNodeContents(el);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                document.execCommand('copy');
+                mostrarToast('📋 Hashtags copiadas!');
+            });
+        }
+
+        // ===== GERADOR DE BIO =====
+        function gerarBio(estilo) {
+            // Atualizar botões ativos
+            document.querySelectorAll('.bio-template-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(estilo)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            const bio = bioData[estilo] || bioData.gamer;
+            const container = document.getElementById('bio-text');
+            container.innerHTML = bio.replace(/\n/g, '<br>');
+            
+            // Salvar para copiar
+            container.dataset.text = bio;
+        }
+
+        function copiarBio() {
+            const text = document.getElementById('bio-text').dataset.text || 
+                        document.getElementById('bio-text').textContent.replace(/\n/g, ' ');
+            navigator.clipboard.writeText(text).then(() => {
+                mostrarToast('📋 Bio copiada!');
+            }).catch(() => {
+                const range = document.createRange();
+                const selection = window.getSelection();
+                const el = document.getElementById('bio-text');
+                range.selectNodeContents(el);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                document.execCommand('copy');
+                mostrarToast('📋 Bio copiada!');
+            });
+        }
+
+        // ===== FUNÇÕES ORIGINAIS (mantidas) =====
+
         function toggleUploadImagem(categoria) {
             const uploadGroup = document.getElementById('upload-imagem-group');
             const categoriasSemImagem = ['Áudio', 'Vídeo', 'Imagens'];
@@ -2052,6 +2557,7 @@
 
         function mostrarSobre() {
             document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('pagina-sobre').classList.remove('hidden');
             document.getElementById('pagina-privacidade').classList.add('hidden');
             document.getElementById('pagina-ranking').classList.add('hidden');
@@ -2062,6 +2568,7 @@
 
         function mostrarPrivacidade() {
             document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('pagina-privacidade').classList.remove('hidden');
             document.getElementById('pagina-sobre').classList.add('hidden');
             document.getElementById('pagina-ranking').classList.add('hidden');
@@ -2072,6 +2579,7 @@
 
         function mostrarRanking() {
             document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('pagina-ranking').classList.remove('hidden');
             document.getElementById('pagina-sobre').classList.add('hidden');
             document.getElementById('pagina-privacidade').classList.add('hidden');
@@ -2083,6 +2591,7 @@
 
         function mostrarFAQ() {
             document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('pagina-faq').classList.remove('hidden');
             document.getElementById('pagina-sobre').classList.add('hidden');
             document.getElementById('pagina-privacidade').classList.add('hidden');
@@ -2093,6 +2602,7 @@
 
         function mostrarTodosArquivos() {
             document.getElementById('conteudo-home').classList.add('hidden');
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('pagina-todos').classList.remove('hidden');
             document.getElementById('pagina-sobre').classList.add('hidden');
             document.getElementById('pagina-privacidade').classList.add('hidden');
@@ -2112,24 +2622,30 @@
             document.querySelector('.favoritos-btn').style.borderColor = 'var(--cyan)';
             const favoritosLista = apks.filter(apk => favoritos.includes(apk.id));
             document.getElementById('titulo-lista').innerHTML = '<i class="fas fa-heart" style="color:#EF4444;margin-right:10px;"></i>Meus Favoritos';
-            if (favoritosLista.length === 0) {
-                document.getElementById('apk-grid').innerHTML = 
-                    '<div style="text-align:center;padding:60px;color:var(--text-secondary);opacity:0.6;"><i class="fas fa-heart" style="font-size:2.5rem;display:block;margin-bottom:16px;opacity:0.3;"></i>Você ainda não tem favoritos. Clique no ❤️ de um arquivo para salvá-lo!</div>';
-            } else {
-                atualizarGrid(favoritosLista);
-            }
+            
+            // Esconder ferramentas e mostrar home
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('conteudo-home').classList.remove('hidden');
             document.getElementById('pagina-sobre').classList.add('hidden');
             document.getElementById('pagina-privacidade').classList.add('hidden');
             document.getElementById('pagina-ranking').classList.add('hidden');
             document.getElementById('pagina-faq').classList.add('hidden');
             document.getElementById('pagina-todos').classList.add('hidden');
+            
+            if (favoritosLista.length === 0) {
+                document.getElementById('apk-grid').innerHTML = 
+                    '<div style="text-align:center;padding:60px;color:var(--text-secondary);opacity:0.6;"><i class="fas fa-heart" style="font-size:2.5rem;display:block;margin-bottom:16px;opacity:0.3;"></i>Você ainda não tem favoritos. Clique no ❤️ de um arquivo para salvá-lo!</div>';
+            } else {
+                atualizarGrid(favoritosLista);
+            }
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            document.querySelector('.menu-item:first-child').classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function voltarParaHome() {
             document.getElementById('conteudo-home').classList.remove('hidden');
+            document.getElementById('pagina-ferramentas').classList.add('hidden');
             document.getElementById('pagina-sobre').classList.add('hidden');
             document.getElementById('pagina-privacidade').classList.add('hidden');
             document.getElementById('pagina-ranking').classList.add('hidden');
@@ -2286,7 +2802,8 @@
                 'hero.stats.games': 'Arquivos',
                 'hero.stats.downloads': 'Downloads',
                 'hero.stats.rating': 'Avaliação',
-                'menu.all': 'Todos',
+                'menu.all': 'Arquivos',
+                'menu.tools': 'Ferramentas',
                 'menu.recent': 'Mais recentes',
                 'search.results': 'Resultados',
                 'search.clear': 'Limpar busca',
@@ -2335,7 +2852,8 @@
                 'hero.stats.games': 'Files',
                 'hero.stats.downloads': 'Downloads',
                 'hero.stats.rating': 'Rating',
-                'menu.all': 'All',
+                'menu.all': 'Files',
+                'menu.tools': 'Tools',
                 'menu.recent': 'Most recent',
                 'search.results': 'Results',
                 'search.clear': 'Clear search',
@@ -2384,7 +2902,8 @@
                 'hero.stats.games': 'Archivos',
                 'hero.stats.downloads': 'Descargas',
                 'hero.stats.rating': 'Valoración',
-                'menu.all': 'Todos',
+                'menu.all': 'Archivos',
+                'menu.tools': 'Herramientas',
                 'menu.recent': 'Más recientes',
                 'search.results': 'Resultados',
                 'search.clear': 'Limpiar búsqueda',
@@ -2523,7 +3042,17 @@
             mostrarLoading();
             setTimeout(() => {
                 document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-                event.target.classList.add('active');
+                document.querySelector('.menu-item:first-child').classList.add('active');
+                
+                // Mostrar home, esconder ferramentas
+                document.getElementById('conteudo-home').classList.remove('hidden');
+                document.getElementById('pagina-ferramentas').classList.add('hidden');
+                document.getElementById('pagina-sobre').classList.add('hidden');
+                document.getElementById('pagina-privacidade').classList.add('hidden');
+                document.getElementById('pagina-ranking').classList.add('hidden');
+                document.getElementById('pagina-faq').classList.add('hidden');
+                document.getElementById('pagina-todos').classList.add('hidden');
+                
                 document.getElementById('titulo-lista').innerHTML = '<i class="fas fa-layer-group" style="color:var(--cyan);margin-right:10px;"></i>Arquivos Disponíveis';
                 document.getElementById('filterCategoria').value = 'todas';
                 document.querySelector('.favoritos-btn').style.background = 'rgba(255,255,255,0.04)';
@@ -2538,7 +3067,16 @@
             mostrarLoading();
             setTimeout(() => {
                 document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-                event.target.classList.add('active');
+                document.querySelector('.menu-item:first-child').classList.add('active');
+                
+                document.getElementById('conteudo-home').classList.remove('hidden');
+                document.getElementById('pagina-ferramentas').classList.add('hidden');
+                document.getElementById('pagina-sobre').classList.add('hidden');
+                document.getElementById('pagina-privacidade').classList.add('hidden');
+                document.getElementById('pagina-ranking').classList.add('hidden');
+                document.getElementById('pagina-faq').classList.add('hidden');
+                document.getElementById('pagina-todos').classList.add('hidden');
+                
                 document.getElementById('titulo-lista').innerHTML = '<i class="fas fa-clock" style="color:var(--cyan);margin-right:10px;"></i>Arquivos mais recentes';
                 document.getElementById('filterCategoria').value = 'todas';
                 document.querySelector('.favoritos-btn').style.background = 'rgba(255,255,255,0.04)';
@@ -2884,6 +3422,16 @@
                 event.target.style.display = 'none';
             }
         }
+
+        // Inicializar com a página de ferramentas visível
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarFerramentas();
+            // Gerar hashtags iniciais
+            setTimeout(() => {
+                gerarHashtags('jogos');
+                gerarBio('gamer');
+            }, 200);
+        });
 
         carregarDados();
     </script>
